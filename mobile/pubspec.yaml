@@ -1,0 +1,22 @@
+name: all_quote_mobile
+description: Flutter mobile intake for the Ontario All-Quote Agent — fills the same form as the website, with AI-assisted input and quote aggregation results.
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_tts: ^4.2.5
+  http: ^1.2.0
+  speech_to_text: ^7.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true

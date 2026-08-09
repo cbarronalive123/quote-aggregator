@@ -1,0 +1,55 @@
+# ---- Secrets / credentials (never commit) ----
+.env
+.env.*
+prod.env.local
+*.pem
+*.key
+*.crt
+server_setup/
+
+# ---- Personal data / PII (never commit) ----
+personal_profile.py
+personal_profile.db
+quote_params.json
+people/real/
+evidence/
+*.png
+*.PDF
+*.pdf
+*.csv
+*_result.json
+*.jsonl
+Corey*
+
+# ---- Databases ----
+*.db
+data/*.db
+
+# ---- Python ----
+__pycache__/
+*.pyc
+.playwright-mcp/
+
+# ---- Node / Next.js ----
+website/node_modules/
+website/.next/
+website/data/*.db
+
+# ---- Flutter / mobile ----
+mobile/build/
+mobile/.dart_tool/
+mobile/.flutter-plugins-dependencies
+mobile/*.apk
+
+# ---- Phone agent ----
+phone-agent/node_modules/
+phone-agent/.env
+phone-agent/recordings/
+phone-agent/calls.json
+phone-agent/*.wav
+phone-agent/*.mp3
+
+# ---- Misc ----
+*.log
+.DS_Store
+Thumbs.db
