@@ -78,7 +78,7 @@ function buildParams(values: Record<string, string>) {
   const cDay = dp.length >= 3 ? dp[2] : "01";
   const cYear = dp.length >= 1 ? dp[0] : "2026";
   // first-licence age = licence year - birth year (scripts want the AGE, form gives the YEAR)
-  const dobYear = Number(dp[0] || 0);
+  const dobYear = Number((s(values.date_of_birth) || "").split("-")[0] || 0);
   const licYear = Number((s(values.first_licence_year) || "").replace(/\D/g, "") || 0);
   const licAge = licYear && dobYear ? String(Math.max(16, licYear - dobYear)) : "21";
   return {
