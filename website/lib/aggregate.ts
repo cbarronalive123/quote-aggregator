@@ -1,8 +1,7 @@
 import { getQuotes } from "./repo";
 import { createCallSession } from "./callSession";
 import { spawn } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync, mkdtempSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import type { QuoteOutcome } from "./types";
 
@@ -155,27 +154,23 @@ function buildParams(values: Record<string, string>) {
 // Shell out to a *_auto_quote.py script headless with a generated params file and
 // parse its result JSON. Returns null on failure (so the mobile-app outcome still shows).
 async function runScript(src: { script: string; brand: string; registry_id: string }, values: Record<string, string>): Promise<QuoteOutcome | null> {
-  const root = path.resolve(process.cwd(), ".."); // website/ -> project root
-  const scriptPath = path.join(root, src.script);
-  const dir = mkdtempSync(path.join(tmpdir(), "quotedrive-"));
-  const input = path.join(dir, "input.json");
-  writeFileSync(input, JSON.stringify(buildParams(values)), "utf8");
-  const resultPath = path.join(root, src.script.replace(/\.py$/, "_result.json"));
-  // Remove any stale result so we only read a fresh one.
-  if (existsSync(resultPath)) {
-    try { writeFileSync(resultPath, "{}", "utf8"); } catch { /* ignore */ }
-  }
+  const workDir = "/opt/quotedrive/work"; // shared host volume mounted at /work in the container
+  const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const inputHost = path.join(workDir, `${id}.json`);
+  const resultHost = path.join(workDir, `${id}_result.json`);
+  writeFileSync(inputHost, JSON.stringify(buildParams(values)), "utf8");
   try {
     await new Promise<void>((resolve) => {
-      const child = spawn("python", [scriptPath, "--headless", "--input", input], {
-        cwd: root,
-        stdio: "ignore",
-      });
-      const timer = setTimeout(() => child.kill(), 120000);
+      const child = spawn("docker", [
+        "exec", "quote-scripts", "python",
+        `/scripts/${src.script}`,
+        "--headless", "--input", `/work/${id}.json`, "--out", `/work/${id}_result.json`,
+      ], { stdio: "ignore" });
+      const timer = setTimeout(() => child.kill(), 180000);
       child.on("close", () => { clearTimeout(timer); resolve(); });
     });
-    if (!existsSync(resultPath)) return null;
-    const parsed = JSON.parse(readFileSync(resultPath, "utf8"));
+    if (!existsSync(resultHost)) return null;
+    const parsed = JSON.parse(readFileSync(resultHost, "utf8"));
     if (!parsed || !parsed.quote_value) return null;
     const outcome: QuoteOutcome = {
       registry_id: src.registry_id,

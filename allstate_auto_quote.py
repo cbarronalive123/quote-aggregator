@@ -185,7 +185,10 @@ def run(headless: bool, params: dict | None = None, out_dir: str = "evidence") -
     y, m, d = _dob_ymd(params)
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(channel="chrome", headless=headless)
+        try:
+            browser = p.chromium.launch(channel="chrome", headless=headless)
+        except Exception:
+            browser = p.chromium.launch(headless=headless)
         ctx = browser.new_context(
             user_agent=("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                         "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"),
@@ -340,11 +343,12 @@ def run(headless: bool, params: dict | None = None, out_dir: str = "evidence") -
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--headless", action="store_true", default=False)
     ap.add_argument("--headed", action="store_true", default=False)
     ap.add_argument("--input", default=None)
     ap.add_argument("--out", default="allstate_auto_quote_result.json")
     args = ap.parse_args()
-
+    headless = args.headless or not args.headed
     print(f"Running {'HEADED' if args.headed else 'HEADLESS'} mode", flush=True)
     profile = load_profile() if not args.input else load_params(args.input)
     if not profile:
