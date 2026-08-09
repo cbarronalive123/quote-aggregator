@@ -54,7 +54,11 @@ import sys
 from playwright.sync_api import sync_playwright
 
 from params_loader import get_param, load_params
-from personal_profile import load_profile
+try:
+    from personal_profile import load_profile  # optional: excluded from shared repo (PII)
+except Exception:
+    def load_profile(*a, **k):
+        return None
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 

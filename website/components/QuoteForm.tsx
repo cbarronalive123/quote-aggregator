@@ -2,13 +2,23 @@
 
 import { useMemo, useState } from "react";
 import { formSections, type FieldDef } from "@/lib/formSchema";
-import { defaultProfile } from "@/lib/data";
+import { defaultProfile, fakeProfile } from "@/lib/data";
 
 function initValues() {
   const v: Record<string, string> = {};
   formSections.forEach((s) =>
     s.fields.forEach((f) => {
       v[f.key] = (defaultProfile as Record<string, string>)[f.key] ?? "";
+    })
+  );
+  return v;
+}
+
+function valuesFor(profile: Record<string, string>) {
+  const v: Record<string, string> = {};
+  formSections.forEach((s) =>
+    s.fields.forEach((f) => {
+      v[f.key] = profile[f.key] ?? "";
     })
   );
   return v;
@@ -90,6 +100,27 @@ export default function QuoteForm() {
       <p className="text-secondary" style={{ margin: "0 0 4px", fontSize: 14 }}>
         We ask once and reuse it to fill every carrier&apos;s form — online or by phone.
       </p>
+
+      {/* Profile presets: load a profile's details, then submit to run the aggregator */}
+      <div style={{ display: "flex", gap: 10, margin: "14px 0", flexWrap: "wrap", alignItems: "center" }}>
+        <span className="text-muted" style={{ fontSize: 13 }}>Load profile:</span>
+        <button
+          type="button"
+          className="btn"
+          onClick={() => setValues(valuesFor(defaultProfile))}
+          style={{ border: "1px solid rgba(255,255,255,0.15)" }}
+        >
+          My profile
+        </button>
+        <button
+          type="button"
+          className="btn"
+          onClick={() => setValues(valuesFor(fakeProfile))}
+          style={{ border: "1px solid rgba(255,255,255,0.15)" }}
+        >
+          Fake profile
+        </button>
+      </div>
 
       {/* Section stepper */}
       <div style={{ display: "flex", gap: 6, margin: "16px 0", flexWrap: "wrap" }}>

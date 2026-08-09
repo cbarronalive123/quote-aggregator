@@ -1,5 +1,9 @@
 import { getQuotes } from "./repo";
 import { createCallSession } from "./callSession";
+import { spawn } from "node:child_process";
+import { existsSync, readFileSync, writeFileSync, mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import type { QuoteOutcome } from "./types";
 
 /**
@@ -58,15 +62,131 @@ async function runScriptQuotes(job: AggregationJob, values: Record<string, strin
 // The auto-quote scripts known to return a real-time $ value for auto.
 function scriptSources() {
   return [
-    { registry_id: "desjardins", script: "desjardins_auto_quote.py", brand: "Desjardins Insurance" },
     { registry_id: "allstate", script: "allstate_auto_quote.py", brand: "Allstate" },
   ];
 }
 
+// Build the canonical params shape the *_auto_quote.py scripts read, from the flat
+// web-form values. The scripts resolve fields via params_loader.get_param(path).
+const MONTHS = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+function buildParams(values: Record<string, string>) {
+  const s = (v?: string) => v ?? "";
+  const d = s(values.coverage_start_date); // YYYY-MM-DD
+  const dp = d ? d.split("-") : [];
+  const cMonth = dp.length >= 2 ? MONTHS[Number(dp[1])] || "September" : "September";
+  const cDay = dp.length >= 3 ? dp[2] : "01";
+  const cYear = dp.length >= 1 ? dp[0] : "2026";
+  return {
+    person: {
+      first_name: s(values.first_name),
+      last_name: s(values.last_name),
+      email: s(values.email),
+      phone: s(values.phone).replace(/\D/g, ""),
+      phone_type: "Cell",
+      date_of_birth: s(values.date_of_birth),
+      sex: s(values.sex),
+      marital_status: s(values.marital_status),
+      street_address: s(values.street_address),
+      city: s(values.city),
+      province: s(values.province),
+      postal_code: s(values.postal_code),
+      tenure: s(values.tenure),
+      address_search: `${s(values.street_address)} ${s(values.city)}`,
+    },
+    auto: {
+      vin: s(values.vin),
+      vehicle_year: s(values.vehicle_year),
+      vehicle_make: s(values.vehicle_make),
+      vehicle_model: s(values.vehicle_model),
+      purchase_month: s(values.purchase_month),
+      purchase_year: s(values.purchase_year),
+      purchase_condition: s(values.purchase_condition),
+      owned_leased: s(values.owned_leased),
+      winter_tires: s(values.winter_tires),
+      annual_km: s(values.annual_km),
+      commute_oneway_km: s(values.commute_oneway_km),
+      coverage_start_month: cMonth,
+      coverage_start_day: cDay,
+      coverage_start_year: cYear,
+    },
+    driver: {
+      licence_class: s(values.licence_class),
+      first_licence_age: s(values.first_licence_year),
+      convictions_3yr: "No",
+      licence_suspended: "No",
+      claims_10yr: "No claims to declare",
+      home_insured_here: "No",
+      ajusto: "No",
+    },
+    allstate: {
+      vehicle_model: s(values.vehicle_model),
+      vehicle_use: "Work / School",
+      annual_km_band: "12001-16000km",
+      one_way_km: s(values.commute_oneway_km) || "15",
+      parking: "Unsecured Condo/Apt Garage or lot",
+      purchase_price: "30000",
+      purchase_month: s(values.purchase_month) || "January",
+      purchase_year: s(values.purchase_year) || "2019",
+      coverage_start: `${cMonth} ${cDay}, ${cYear}`,
+      marital_status: s(values.marital_status),
+      gender: s(values.sex) === "F" ? "Female" : "Male",
+      first_licensed_age: "21",
+      graduated_licensing: "Yes",
+      license_class: s(values.licence_class) || "G",
+      g_within_12mo: "No",
+      minor_violations: "None",
+      household_drivers: "No",
+      insured: "Yes",
+      cancelled: "No",
+      claims_6yr: "No",
+      ownership: "Owned",
+      only_owner: "Yes",
+      within_30d: "No",
+    },
+  };
+}
+
 // Shell out to a *_auto_quote.py script headless with a generated params file and
-// parse its result JSON. Returns null on failure. TODO: paths + headless reliability.
+// parse its result JSON. Returns null on failure (so the mobile-app outcome still shows).
 async function runScript(src: { script: string; brand: string; registry_id: string }, values: Record<string, string>): Promise<QuoteOutcome | null> {
-  return null; // placeholder until scripts complete headless on the server
+  const root = path.resolve(process.cwd(), ".."); // website/ -> project root
+  const scriptPath = path.join(root, src.script);
+  const dir = mkdtempSync(path.join(tmpdir(), "quotedrive-"));
+  const input = path.join(dir, "input.json");
+  writeFileSync(input, JSON.stringify(buildParams(values)), "utf8");
+  const resultPath = path.join(root, src.script.replace(/\.py$/, "_result.json"));
+  // Remove any stale result so we only read a fresh one.
+  if (existsSync(resultPath)) {
+    try { writeFileSync(resultPath, "{}", "utf8"); } catch { /* ignore */ }
+  }
+  try {
+    await new Promise<void>((resolve) => {
+      const child = spawn("python", [scriptPath, "--headless", "--input", input], {
+        cwd: root,
+        stdio: "ignore",
+      });
+      const timer = setTimeout(() => child.kill(), 120000);
+      child.on("close", () => { clearTimeout(timer); resolve(); });
+    });
+    if (!existsSync(resultPath)) return null;
+    const parsed = JSON.parse(readFileSync(resultPath, "utf8"));
+    if (!parsed || !parsed.quote_value) return null;
+    const outcome: QuoteOutcome = {
+      registry_id: src.registry_id,
+      brand: src.brand,
+      status: "quoted_comparable",
+      monthly_premium: parsed.quote_value ? Number(String(parsed.quote_value).replace(/,/g, "")) : undefined,
+      quote_id: parsed.quote_number ?? undefined,
+      coverage_notes: parsed.coverage ? Object.values(parsed.coverage).join(" | ") : "Automated quote",
+      confidence: "medium",
+      timestamp: new Date().toISOString(),
+      source: "automated",
+      evidence: parsed.evidence ?? undefined,
+    };
+    return outcome;
+  } catch {
+    return null;
+  }
 }
 
 // The mobile app is the only call target: always create one in-app call session.
