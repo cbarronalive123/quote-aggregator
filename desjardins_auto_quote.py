@@ -64,7 +64,11 @@ import time
 from playwright.sync_api import sync_playwright
 
 from params_loader import get_param, load_params
-from personal_profile import load_profile
+try:
+    from personal_profile import load_profile  # optional: excluded from shared repo (PII)
+except Exception:
+    def load_profile(*a, **k):
+        return None
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
@@ -215,7 +219,7 @@ def run(headless: bool, params: dict | None = None, out_dir: str = "evidence") -
     y, m, d = _dob_split(params)
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=headless)
+        browser = p.chromium.launch(channel="chrome", headless=headless)
         ctx = browser.new_context(
             user_agent=("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                         "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"),
@@ -223,10 +227,13 @@ def run(headless: bool, params: dict | None = None, out_dir: str = "evidence") -
         )
         page = ctx.new_page()
         page.set_default_timeout(6000)  # fail locators fast during iteration
+        def log(step): print(f"[desjardins] STEP {step}", flush=True)
         try:
+            log("load")
             page.goto(HOME_URL, wait_until="domcontentloaded", timeout=60000)
             page.wait_for_timeout(3000)  # consent step renders; avoid networkidle (never settles)
 
+            log("consent")
             # 0) Consent: dismiss any OneTrust cookie banner, then accept privacy consent
             #    (Accept button = name="unifiedConsentAccept" = wizard-next-button).
             try:
@@ -247,6 +254,7 @@ def run(headless: bool, params: dict | None = None, out_dir: str = "evidence") -
                 if page.get_by_role("textbox", name="First name").count():
                     break
 
+            log("1 client")
             # 1) clientInformationStep
             _type(page, page.get_by_role("textbox", name="First name"), V["first_name"])
             _type(page, page.get_by_role("textbox", name="Last name"), V["last_name"])
@@ -269,6 +277,7 @@ def run(headless: bool, params: dict | None = None, out_dir: str = "evidence") -
                 pass
             _click_next(page, "wizard-next-button")
 
+            log("2 contact")
             # 2) contactInfoStep
             _type(page, page.get_by_role("textbox", name="Number"), V["phone"])
             _type(page, page.get_by_role("textbox", name=re.compile("^Email")), V["email"])
@@ -282,6 +291,7 @@ def run(headless: bool, params: dict | None = None, out_dir: str = "evidence") -
             _click_next(page, "wizard-next-button")
             page.wait_for_timeout(4000)  # quote id creation + nav
 
+            log("3 vehicle")
             # 3) vehicleSelectorStep
             _select(page, page.get_by_role("textbox", name="Year"), V["vehicle_year"])
             _select(page, page.get_by_role("textbox", name="Make"), V["vehicle_make"])
@@ -289,6 +299,7 @@ def run(headless: bool, params: dict | None = None, out_dir: str = "evidence") -
             _pick(page, re.compile("Type of vehicle use"), V["type_of_use"])
             _click_next(page)
 
+            log("4 vehicle info")
             # 4) vehicleInformationStep
             _select(page, page.locator('input[id$="monthSelect--accessibleSelectInput"]'), V["acq_month"])
             _select(page, page.locator('input[id$="yearSelect--accessibleSelectInput"]'), V["acq_year"])
@@ -304,6 +315,7 @@ def run(headless: bool, params: dict | None = None, out_dir: str = "evidence") -
             _pick(page, re.compile("Additional vehicle to insure"), V["add_vehicle"])
             _click_next(page)
 
+            log("5 driver id")
             # 5) driverIdentificationStep
             _pick(page, re.compile("Marital status"), V["marital"])
             _pick(page, re.compile("Employment status"), V["employment"])

@@ -62,6 +62,7 @@ async function runScriptQuotes(job: AggregationJob, values: Record<string, strin
 // The auto-quote scripts known to return a real-time $ value for auto.
 function scriptSources() {
   return [
+    { registry_id: "belairdirect", script: "belairdirect_auto_quote.py", brand: "belairdirect" },
     { registry_id: "allstate", script: "allstate_auto_quote.py", brand: "Allstate" },
   ];
 }
@@ -76,6 +77,10 @@ function buildParams(values: Record<string, string>) {
   const cMonth = dp.length >= 2 ? MONTHS[Number(dp[1])] || "September" : "September";
   const cDay = dp.length >= 3 ? dp[2] : "01";
   const cYear = dp.length >= 1 ? dp[0] : "2026";
+  // first-licence age = licence year - birth year (scripts want the AGE, form gives the YEAR)
+  const dobYear = Number(dp[0] || 0);
+  const licYear = Number((s(values.first_licence_year) || "").replace(/\D/g, "") || 0);
+  const licAge = licYear && dobYear ? String(Math.max(16, licYear - dobYear)) : "21";
   return {
     person: {
       first_name: s(values.first_name),
@@ -111,7 +116,8 @@ function buildParams(values: Record<string, string>) {
     },
     driver: {
       licence_class: s(values.licence_class),
-      first_licence_age: s(values.first_licence_year),
+      first_licence_age: licAge,
+      years_with_insurer: s(values.years_with_insurer) || "5 years or more",
       convictions_3yr: "No",
       licence_suspended: "No",
       claims_10yr: "No claims to declare",

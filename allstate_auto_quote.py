@@ -124,7 +124,14 @@ def _type(page, locator, value):
 
 
 def _select(page, label, value):
-    page.get_by_label(label, exact=True).select_option(value)
+    """Select an option on a native <select>, matched by label or name."""
+    try:
+        page.get_by_label(label, exact=True).select_option(value)
+    except Exception:
+        try:
+            page.get_by_label(label).first.select_option(value)
+        except Exception:
+            page.locator(f'select[name="{label}"], select[id*="{label}"]').first.select_option(value)
     page.wait_for_timeout(150)
 
 
@@ -178,7 +185,7 @@ def run(headless: bool, params: dict | None = None, out_dir: str = "evidence") -
     y, m, d = _dob_ymd(params)
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=headless)
+        browser = p.chromium.launch(channel="chrome", headless=headless)
         ctx = browser.new_context(
             user_agent=("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                         "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"),
@@ -186,7 +193,9 @@ def run(headless: bool, params: dict | None = None, out_dir: str = "evidence") -
         )
         page = ctx.new_page()
         page.set_default_timeout(7000)
+        def log(step): print(f"[allstate] STEP {step}", flush=True)
         try:
+            log("landing")
             # 1) Landing
             page.goto(LANDING_URL, wait_until="domcontentloaded", timeout=60000)
             page.wait_for_timeout(2500)
@@ -203,6 +212,7 @@ def run(headless: bool, params: dict | None = None, out_dir: str = "evidence") -
                 pass
             page.wait_for_timeout(2500)
 
+            log("getstarted")
             # 2) Get Started -> SHOP & BUY
             for _ in range(3):
                 try:
@@ -216,12 +226,14 @@ def run(headless: bool, params: dict | None = None, out_dir: str = "evidence") -
                     page.wait_for_timeout(1500)
             page.wait_for_timeout(3000)
 
+            log("vehicle dialog")
             # 3) Summary -- vehicle dialog
             _select(page, "year", V["vehicle_year"])
             _select(page, "make", V["vehicle_make"])
             _select(page, "model", V["vehicle_model"])
             _click_continue(page)
 
+            log("vehicle details dialog")
             # vehicle details dialog
             _pick(page, "new, used or a dealership demo", V["condition"])
             _pick(page, "owned, financed, or leased", V["ownership"])
@@ -233,6 +245,7 @@ def run(headless: bool, params: dict | None = None, out_dir: str = "evidence") -
             _select(page, "Purchase year", V["purchase_year"])
             _click_continue(page)
 
+            log("vehicle use dialog")
             # vehicle use dialog
             _select(page, "vehicle-used-for", V["vehicle_use"])
             _type(page, page.get_by_role("spinbutton", name="one way to work"), V["one_way_km"])
@@ -244,6 +257,7 @@ def run(headless: bool, params: dict | None = None, out_dir: str = "evidence") -
                 pass
             _click_continue(page)
 
+            log("savings dialog")
             # savings dialog
             _pick(page, "winter tires installed", V["winter_tires"])
             try:
@@ -254,6 +268,7 @@ def run(headless: bool, params: dict | None = None, out_dir: str = "evidence") -
             _pick(page, "anti-theft tracking", "No")
             _click_continue(page)
 
+            log("driver details dialog")
             # driver details dialog
             _type(page, page.get_by_role("textbox", name="First name"), V["first_name"])
             _type(page, page.get_by_role("textbox", name="Last name"), V["last_name"])
@@ -263,6 +278,7 @@ def run(headless: bool, params: dict | None = None, out_dir: str = "evidence") -
             _pick(page, "household-licensed", V["household"])
             _click_continue(page)
 
+            log("driving history dialog")
             # driving history dialog
             _type(page, page.get_by_role("textbox", name="first licensed"), V["first_lic_age"])
             _pick(page, "graduated licensing", V["graduated"])
@@ -273,12 +289,14 @@ def run(headless: bool, params: dict | None = None, out_dir: str = "evidence") -
             _pick(page, "license-suspended", V["suspended"])
             _click_continue(page)
 
+            log("insurance history dialog")
             # insurance history dialog
             _pick(page, "prior-insurance", V["insured"])
             _pick(page, "policy-cancelled", V["cancelled"])
             _pick(page, "claims-details", V["claims_6yr"])
             _click_continue(page)
 
+            log("summary + get a quote")
             # summary -> consent -> get a quote
             _pick(page, "include Drivewise", V["drivewise"])
             _type(page, page.get_by_role("textbox", name="Email address"), V["email"])
@@ -287,6 +305,7 @@ def run(headless: bool, params: dict | None = None, out_dir: str = "evidence") -
             page.get_by_role("button", name="get a quote").click()
             page.wait_for_timeout(6000)
 
+            log("quote page")
             # 4) Quote page
             body = page.locator("body").inner_text(timeout=10000)
             m = re.search(r"\$\s?(\d[\d,]*\.?\d*)\s*/\s*month", body)
