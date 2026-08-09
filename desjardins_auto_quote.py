@@ -219,7 +219,10 @@ def run(headless: bool, params: dict | None = None, out_dir: str = "evidence") -
     y, m, d = _dob_split(params)
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(channel="chrome", headless=headless)
+        try:
+            browser = p.chromium.launch(channel="chrome", headless=headless)
+        except Exception:
+            browser = p.chromium.launch(headless=headless)
         ctx = browser.new_context(
             user_agent=("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                         "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"),

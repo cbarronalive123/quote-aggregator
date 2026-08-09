@@ -5,9 +5,11 @@ import 'incoming_call_page.dart';
 
 /// The same intake form the website renders, driven by the schema fetched from
 /// `/api/form-schema`. On submit it starts the website's quote aggregation and
-/// navigates to the results page.
+/// navigates to the in-app simulated call. When [initialValues] is provided the
+/// form starts pre-filled (e.g. from a saved profile).
 class FormPage extends StatefulWidget {
-  const FormPage({super.key});
+  final Map<String, String>? initialValues;
+  const FormPage({super.key, this.initialValues});
 
   @override
   State<FormPage> createState() => _FormPageState();
@@ -32,7 +34,8 @@ class _FormPageState extends State<FormPage> {
         _sections = sections;
         _values = {
           for (final s in sections)
-            for (final f in s.fields) f.key: '',
+            for (final f in s.fields)
+              f.key: widget.initialValues?[f.key] ?? '',
         };
         _loadingSchema = false;
       });

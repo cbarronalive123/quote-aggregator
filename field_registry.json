@@ -1,0 +1,325 @@
+{
+  "version": 1,
+  "note": "Field registry. For each form, every field is documented as FIXED (a bounded set of options, listed) or VARIABLE (free-text the user must type). 'fixed' fields map to a select/radio/checkbox; 'variable' fields map to a text/textarea/email/tel/date input. Values for fixed fields MUST be one of the listed options. Registry is the source of truth — never guess options; add them here when discovered.",
+  "email_to": "cormbar@msn.com",
+  "forms": {
+    "vergeinsurance_auto": {
+      "form_url": "https://www.vergeinsurance.com/auto-insurance-quote/",
+      "kind": "lead_gen",
+      "fields": {
+        "first-name":        {"type": "variable", "datatype": "text",    "param": "person.first_name"},
+        "last-name":         {"type": "variable", "datatype": "text",    "param": "person.last_name"},
+        "your-email":        {"type": "variable", "datatype": "email",   "param": "person.email"},
+        "your-phone":        {"type": "variable", "datatype": "tel",     "param": "person.phone"},
+        "street-address":    {"type": "variable", "datatype": "text",    "param": "person.street_address"},
+        "city":              {"type": "variable", "datatype": "text",    "param": "person.city"},
+        "province":          {"type": "fixed",    "datatype": "select",  "options": ["Ontario", "Alberta", "British Columbia", "Manitoba", "New Brunswick", "Newfoundland and Labrador", "Northwest Territories", "Nova Scotia", "Nunavut", "Prince Edward Island", "Quebec", "Saskatchewan", "Yukon"], "param": "person.province"},
+        "postal-code":       {"type": "variable", "datatype": "text",    "param": "person.postal_code"},
+        "effective-date":    {"type": "variable", "datatype": "date",    "format": "YYYY-MM-DD", "param": "auto.coverage_start_date"},
+        "cancellation-nonpayment": {"type": "fixed", "datatype": "select", "options": ["Yes", "No"], "param": "auto.cancellation_nonpayment", "default": "No"}
+      }
+    },
+    "armour_condo": {
+      "form_url": "https://www.armour-insurance.com/condo-quote/",
+      "kind": "lead_gen",
+      "note": "Forminator [one,two] selects: 'one'=Yes, 'two'=No. Category auto-set. Square-feet AND building-year are both capped at 150 (form bug).",
+      "fields": {
+        "address-1-street_address": {"type": "variable", "datatype": "text", "param": "person.street_address"},
+        "address-1-city":           {"type": "variable", "datatype": "text", "param": "person.city"},
+        "address-1-zip":            {"type": "variable", "datatype": "postal", "param": "person.postal_code"},
+        "number-1":                 {"type": "variable", "datatype": "number", "label": "Age", "param": "property_condo.age"},
+        "number-2":                 {"type": "variable", "datatype": "number", "label": "Square feet", "max": 150, "param": "property_condo.square_feet"},
+        "number-3":                 {"type": "variable", "datatype": "number", "label": "Building year", "max": 150, "param": "property_condo.building_year"},
+        "select-1":                 {"type": "fixed", "datatype": "select", "label": "Building type", "options": ["Detached", "Semi-Detached", "Duplex", "Triplex", "Other"], "param": "property_condo.building_type"},
+        "checkbox-1[]":             {"type": "fixed", "datatype": "checkbox", "label": "Heating", "options": ["one", "two"], "param": "property_condo.heating"},
+        "select-2":                 {"type": "fixed", "datatype": "select", "label": "Has condo policy", "options": ["one", "two"], "param": "property_condo.has_condo_policy"},
+        "select-8":                 {"type": "fixed", "datatype": "select", "label": "Claims in 6 yrs", "options": ["one", "two"], "param": "property_condo.claims", "default": "one"},
+        "select-3":                 {"type": "fixed", "datatype": "select", "label": "Years lived", "options": ["one", "two"], "param": "property_condo.years_lived"},
+        "select-4":                 {"type": "fixed", "datatype": "select", "label": "Betterments value", "options": ["$50,000", "$100,000", "$200,000", "$300,000", "$500,000"], "param": "property_condo.betterments_value"},
+        "select-9":                 {"type": "fixed", "datatype": "select", "label": "Contents value", "options": ["$50,000", "$100,000", "$200,000", "$300,000", "$500,000"], "param": "property_condo.contents_value"},
+        "textarea-1":               {"type": "variable", "datatype": "textarea", "label": "Unique features", "param": "property_condo.unique_features"},
+        "select-5":                 {"type": "fixed", "datatype": "select", "label": "Burglar alarm", "options": ["one", "two"], "param": "property_condo.burglar_alarm"},
+        "select-6":                 {"type": "fixed", "datatype": "select", "label": "Non-smoker", "options": ["one", "two"], "param": "property_condo.non_smoker"},
+        "select-10":                {"type": "fixed", "datatype": "select", "label": "Mortgage", "options": ["one", "two"], "param": "property_condo.has_mortgage"},
+        "select-7":                 {"type": "fixed", "datatype": "select", "label": "Retired", "options": ["one", "two"], "param": "property_condo.retired"}
+      }
+    },
+    "aviva_auto": {
+      "form_url": "https://www.aviva.ca/bin/aviva/quoter",
+      "kind": "quote",
+      "note": "Multi-step Angular rater at myaviva.avivainsurance.ca/avivaquoter/bol/auto. Radio values are case-sensitive.",
+      "fields": {
+        "vehicleYear":     {"type": "fixed", "datatype": "select", "label": "Year", "options": ["2019", "2020", "2021", "2022"], "param": "auto.vehicle_year"},
+        "vehicleMake":     {"type": "fixed", "datatype": "select", "label": "Make", "options": ["HONDA", "TOYOTA", "FORD", "CHEVROLET", "BMW"], "param": "auto.vehicle_make"},
+        "vehicleModel":    {"type": "fixed", "datatype": "select", "label": "Model", "options": ["ACCORD EX 4DR"], "param": "auto.vehicle_model"},
+        "purchaseDate_month": {"type": "fixed", "datatype": "select", "options": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], "param": "auto.purchase_month"},
+        "purchaseDate_year":  {"type": "fixed", "datatype": "select", "options": ["2020", "2021", "2022", "2023"], "param": "auto.purchase_year"},
+        "purchaseCondition":  {"type": "fixed", "datatype": "radio", "options": ["new", "used", "demo"], "param": "auto.purchase_condition"},
+        "winterTires":     {"type": "fixed", "datatype": "radio", "options": ["yes", "no"], "param": "auto.winter_tires"},
+        "hasAntiTheftDevice": {"type": "fixed", "datatype": "radio", "options": ["yes", "no"], "param": "auto.anti_theft"},
+        "annualMileage":   {"type": "variable", "datatype": "number", "param": "auto.annual_km"},
+        "commutePerWeek":  {"type": "fixed", "datatype": "select", "options": ["0", "1", "2", "3", "4", "5", "6", "7"], "param": "auto.commute_days"},
+        "commutingMiles":  {"type": "variable", "datatype": "number", "param": "auto.commute_oneway_km"},
+        "businessUse":     {"type": "fixed", "datatype": "radio", "options": ["yes", "no"], "param": "auto.business_use"},
+        "coverageStartDate": {"type": "variable", "datatype": "date", "format": "MM/DD/YYYY", "param": "auto.coverage_start_date"},
+        "driverFirstName": {"type": "variable", "datatype": "text", "param": "person.first_name"},
+        "driverLastName":  {"type": "variable", "datatype": "text", "param": "person.last_name"},
+        "driverDOB":       {"type": "variable", "datatype": "date", "param": "person.date_of_birth"},
+        "sex":             {"type": "fixed", "datatype": "radio", "options": ["M", "F"], "param": "person.sex"},
+        "maritalStatus":   {"type": "fixed", "datatype": "select", "options": ["S", "M", "C", "P", "D", "W"], "param": "person.marital_status"},
+        "retired":         {"type": "fixed", "datatype": "radio", "options": ["yes", "no"], "param": "auto.retired"},
+        "combinedPolicyDiscount": {"type": "fixed", "datatype": "radio", "options": ["NO", "ME", "PARTNER"], "param": "auto.combined_policy"},
+        "telusHealth":     {"type": "fixed", "datatype": "radio", "options": ["yes", "no"], "param": "auto.telus_health"},
+        "hadPriorInsurance": {"type": "fixed", "datatype": "radio", "options": ["greatthan3years", "lessthan3years"], "param": "auto.prior_insurance"},
+        "licenseClass":    {"type": "fixed", "datatype": "radio", "options": ["G", "G2", "other_ac"], "param": "auto.licence_class"},
+        "firstLicenceDate_month": {"type": "fixed", "datatype": "select", "options": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], "param": "auto.first_licence_month"},
+        "firstLicenceDate_year":  {"type": "fixed", "datatype": "select", "options": ["2008", "2009", "2010", "2015"], "param": "auto.first_licence_year"},
+        "isGraduatedLicense": {"type": "fixed", "datatype": "radio", "options": ["yes", "no"], "param": "auto.held_other_classes"},
+        "graduateLicenseDate_month": {"type": "fixed", "datatype": "select", "options": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], "param": "auto.g2_month"},
+        "graduateLicenseDate_year":  {"type": "fixed", "datatype": "select", "options": ["2006", "2007", "2008"], "param": "auto.g2_year"},
+        "hasOutOfProvinceLicense": {"type": "fixed", "datatype": "radio", "options": ["yes", "no"], "param": "auto.out_of_province_continuous"},
+        "internationalLicenseClass": {"type": "fixed", "datatype": "radio", "options": ["0", "1", "2"], "param": "auto.international_continuous"},
+        "phoneType":      {"type": "fixed", "datatype": "select", "options": ["mobile", "work", "home"], "param": "person.phone_type"},
+        "userEmail":      {"type": "variable", "datatype": "email", "param": "person.email"}
+      }
+    },
+    "aprilmarine_boat": {      "form_url": "https://aprilmarine.ca/on-en/quote",
+      "kind": "quote",
+      "note": "Boat rater at prime.aprilmarine.ca opens in a new tab. Value auto-formats (35000 -> '35 000'). Renewal date required.",
+      "fields": {
+        "boat_type":      {"type": "fixed", "datatype": "select", "options": ["Fishing boat", "PwC", "Sailboat", "Motorboat"], "param": "boat.boat_type"},
+        "make":           {"type": "fixed", "datatype": "select", "options": ["BAYLINER", "SEA-DOO (BRP)", "YAMAHA", "BOSTON WHALER"], "param": "boat.make"},
+        "model":          {"type": "fixed", "datatype": "select", "options": ["XP", "XT", "160", "170 Bowrider", "180 Bowrider"], "param": "boat.model"},
+        "engine_type":    {"type": "fixed", "datatype": "select", "options": ["Outboard", "In/Out board", "Inboard", "Jet", "Jet M2", "Electric"], "param": "boat.engine_type"},
+        "category":       {"type": "fixed", "datatype": "select", "options": ["Runabout", "Cruiser", "Fishing Boat", "Cuddy Cabin", "Pontoon"], "param": "boat.category"},
+        "boat_year":      {"type": "variable", "datatype": "number", "param": "boat.boat_year"},
+        "boat_value":     {"type": "variable", "datatype": "number", "param": "boat.boat_value"},
+        "first_name":     {"type": "variable", "datatype": "text", "param": "person.first_name"},
+        "last_name":      {"type": "variable", "datatype": "text", "param": "person.last_name"},
+        "email":          {"type": "variable", "datatype": "email", "param": "person.email"},
+        "phone":          {"type": "variable", "datatype": "tel", "param": "person.phone"},
+        "dob":            {"type": "variable", "datatype": "date", "format": "YYYY/MM/DD", "param": "person.date_of_birth"},
+        "owned":          {"type": "fixed", "datatype": "radio", "options": ["less_than_12_months", "between_12_and_24_months", "more_than_24_months"], "param": "boat.owned_months"},
+        "already_insured": {"type": "fixed", "datatype": "radio", "options": ["no", "yes"], "param": "boat.already_insured"},
+        "renewal_date":   {"type": "variable", "datatype": "date", "format": "YYYY/MM/DD", "param": "boat.renewal_date"},
+        "claim_number":   {"type": "fixed", "datatype": "radio", "options": ["0", "1", "2", "3"], "param": "boat.boat_claims"},
+        "license_suspension": {"type": "fixed", "datatype": "radio", "options": ["0", "1"], "param": "boat.licence_suspension"}
+      }
+    },
+    "allianceincome_life": {
+      "form_url": "https://allianceincome.com/services/life-insurance/",
+      "kind": "lead_gen",
+      "note": "Fluent Form #24. Intake form that redirects to partner rater insurdinary.ca for the actual premium.",
+      "fields": {
+        "first_name": {"type": "variable", "datatype": "text", "param": "person.first_name"},
+        "last_name":  {"type": "variable", "datatype": "text", "param": "person.last_name"},
+        "phone":      {"type": "variable", "datatype": "tel", "param": "person.phone"},
+        "email":      {"type": "variable", "datatype": "email", "param": "person.email"},
+        "province":   {"type": "fixed", "datatype": "select", "options": ["Alberta", "British Columbia", "Manitoba", "New Brunswick", "Newfoundland and Labrador", "Northwest Territories", "Nova Scotia", "Nunavut", "Ontario", "Prince Edward Island", "Quebec", "Saskatchewan", "Yukon"], "param": "person.province"},
+        "product":    {"type": "fixed", "datatype": "select", "options": ["Permanent Life Insurance", "Term Life Insurance", "Seniors Life Insurance", "Joint Life Insurance", "Mortgage Life Insurance", "No Medical Life Insurance", "Critical Illness Insurance", "Disability Insurance", "Travel Insurance", "Funeral Expense Insurance"], "param": "life.product"},
+        "age":        {"type": "fixed", "datatype": "select", "options": ["Under 18", "18 - 24", "25 - 34", "35 - 44", "45 - 54", "55- 64", "65 or above"], "param": "life.age"},
+        "terms":      {"type": "fixed", "datatype": "checkbox", "options": ["yes"], "param": "life.terms"}
+      }
+    },
+    "cheaplifeinsurance_life": {
+      "form_url": "https://www.cheaplifeinsurance.ca/quote/life-insurance-quote.html?term",
+      "kind": "lead_gen",
+      "note": "CGI form (#quote -> /cgi/quote.cgi). Quote emailed within 24h; reference number returned. Split phone area_code/prefix/suffix + evening phone required.",
+      "fields": {
+        "amount":        {"type": "fixed", "datatype": "select", "options": ["$50,000", "$100,000", "$250,000", "$500,000", "$1,000,000", "$2,000,000", "$5,000,000"], "param": "life.amount"},
+        "term":          {"type": "fixed", "datatype": "select", "options": ["10 Year", "20 Year", "to age 75", "Permanent"], "param": "life.term"},
+        "waiver":        {"type": "fixed", "datatype": "radio", "options": ["Yes", "No"], "param": "life.waiver_of_premium"},
+        "gender":        {"type": "fixed", "datatype": "select", "options": ["Male", "Female"], "param": "person.sex"},
+        "tobacco_use":   {"type": "fixed", "datatype": "select", "options": ["None, Ever", "None in 5 years", "None in 3 years", "None in 1 year", "Pipes / Cigars", "Cigarettes", "Patch / gum"], "param": "life.tobacco_use"},
+        "first_name":    {"type": "variable", "datatype": "text", "param": "person.first_name"},
+        "last_name":     {"type": "variable", "datatype": "text", "param": "person.last_name"},
+        "email":         {"type": "variable", "datatype": "email", "param": "person.email"},
+        "area_code":     {"type": "variable", "datatype": "tel", "param": "person.phone_area"},
+        "phone_prefix":  {"type": "variable", "datatype": "tel", "param": "person.phone_prefix"},
+        "phone_suffix":  {"type": "variable", "datatype": "tel", "param": "person.phone_suffix"},
+        "postal_code":   {"type": "variable", "datatype": "postal", "param": "person.postal_code"}
+      }
+    },
+    "empire_life": {
+      "form_url": "https://www.empire.ca/insurance/buy-life-insurance/quote-buy",
+      "kind": "quote",
+      "note": "Empire Life live online quote-and-buy. The 'Your Quote' value updates live as the user fills the form (returns a real premium, e.g. $17.33/month). Do NOT wait for networkidle (reCAPTCHA iframe keeps it busy).",
+      "fields": {
+        "province":        {"type": "fixed", "datatype": "select", "options": ["Alberta", "British Columbia", "Manitoba", "New Brunswick", "Newfoundland and Labrador", "Nova Scotia", "Northwest Territories", "Nunavut", "Ontario", "Prince Edward Island", "Quebec", "Saskatchewan", "Yukon"], "param": "person.province"},
+        "day":             {"type": "variable", "datatype": "date", "param": "person.date_of_birth"},
+        "month":           {"type": "variable", "datatype": "date", "param": "person.date_of_birth"},
+        "year":            {"type": "variable", "datatype": "date", "param": "person.date_of_birth"},
+        "gender":          {"type": "fixed", "datatype": "radio", "options": ["M", "F"], "param": "person.sex"},
+        "smoker":          {"type": "fixed", "datatype": "radio", "options": ["N", "S"], "param": "life.tobacco_use"},
+        "product":         {"type": "fixed", "datatype": "radio", "options": ["T10", "T20"], "param": "life.product"},
+        "existing_si":     {"type": "fixed", "datatype": "radio", "options": ["False", "True"], "param": "life.existing_coverage"},
+        "coverage_amount": {"type": "fixed", "datatype": "text", "options": ["$100,000", "$250,000", "$500,000", "$1,000,000"], "param": "life.coverage_amount"},
+        "payment_method":  {"type": "fixed", "datatype": "radio", "options": ["Monthly", "Annually"], "param": "life.payment_method"}
+      }
+    },
+    "canadianterminsurance_life": {
+      "form_url": "https://canadianterminsurance.ca/",
+      "kind": "quote",
+      "note": "Full quote form is on the HOMEPAGE (scroll down). Get a Quote posts to winquote.net/compete.pl which returns a ranked table of annual premiums from many carriers + a quote reference ID. The Get a Quote button starts disabled; enable it via JS after filling required fields.",
+      "fields": {
+        "firstname":        {"type": "variable", "datatype": "text", "param": "person.first_name"},
+        "visitor":          {"type": "variable", "datatype": "email", "param": "person.email"},
+        "telephone":        {"type": "variable", "datatype": "tel", "param": "person.phone"},
+        "birth":            {"type": "variable", "datatype": "date", "param": "person.date_of_birth"},
+        "province":         {"type": "fixed", "datatype": "select", "options": ["British Columbia", "Alberta", "Saskatchewan", "Manitoba", "Ontario", "Quebec", "Nova Scotia", "New Brunswick", "Prince Edward Island", "Newfoundland & Labrador"], "param": "person.province"},
+        "gender":           {"type": "fixed", "datatype": "radio", "options": ["1", "2"], "param": "person.sex"},
+        "smoker":           {"type": "fixed", "datatype": "radio", "options": ["100", "0"], "param": "life.tobacco_use"},
+        "health_risk":      {"type": "fixed", "datatype": "select", "options": ["Super Preferred", "Preferred", "Select Regular", "Regular"], "param": "life.health_risk"},
+        "amount":           {"type": "fixed", "datatype": "select", "options": ["$ 500,000", "$ 1,000,000"], "param": "life.coverage_amount"},
+        "payment_schedule": {"type": "fixed", "datatype": "select", "options": ["Annual", "Semi-Annual", "Quarterly", "Monthly"], "param": "life.payment_method"},
+        "product":          {"type": "fixed", "datatype": "select", "options": ["10 Year Term", "20 Year Term", "30 Year Term"], "param": "life.term"}
+      }
+    },
+    "churchillinsurance_life": {
+      "form_url": "https://churchillinsurance.ca/Request-a-Quote.html",
+      "kind": "lead_gen",
+      "note": "nicepage form -> POST /scripts/form-b968.php returns success:true. The 'Submit' control is an <a href=#> that does NOT submit; use form.requestSubmit(). Broker responds with a quote (no $ on-page).",
+      "fields": {
+        "name":    {"type": "variable", "datatype": "text", "param": "person.first_name"},
+        "email":   {"type": "variable", "datatype": "email", "param": "person.email"},
+        "Sex":     {"type": "fixed", "datatype": "select", "options": ["Male", "Female"], "param": "person.sex"},
+        "Non Smoker": {"type": "fixed", "datatype": "select", "options": ["Non Smoker", "Smoker"], "param": "life.tobacco_use"},
+        "DOB":     {"type": "variable", "datatype": "date", "format": "YYYY-MM-DD", "param": "person.date_of_birth"},
+        "Coverage": {"type": "variable", "datatype": "text", "param": "life.coverage_amount"},
+        "type":    {"type": "fixed", "datatype": "radio", "options": ["Term Life Insurance", "Universal Life Insurance", "Whole Life Insurance", "Critical Illness Insurance", "Disability Insurance", "Travel Insurance"], "param": "life.product"},
+        "phone":   {"type": "variable", "datatype": "tel", "param": "person.phone"}
+      }
+    },
+    "eriemutual_auto": {
+      "form_url": "https://www.eriemutual.com/insurance/auto-insurance/auto-insurance-quote/",
+      "kind": "lead_gen",
+      "note": "Contact Form 7 (#14123). Fills personal/policy/vehicle/driver/report-card and POSTs to CF7 feedback endpoint (no $ on-page; broker responds). Date inputs (effective-date, driver-birthdate) are type=date YYYY-MM-DD; CF7 SWV rejects them if filled via JS value setter (use Playwright fill).",
+      "fields": {
+        "firstname":         {"type": "variable", "datatype": "text", "param": "person.first_name"},
+        "lastname":          {"type": "variable", "datatype": "text", "param": "person.last_name"},
+        "postalcode":        {"type": "variable", "datatype": "postal", "param": "person.postal_code"},
+        "email-address":     {"type": "variable", "datatype": "email", "param": "person.email"},
+        "phone":             {"type": "variable", "datatype": "tel", "param": "person.phone"},
+        "region":            {"type": "fixed", "datatype": "select", "options": ["Haldimand", "Niagara", "Norfolk", "Brant", "Hamilton Wentworth", "Burlington", "Other"], "param": "auto.region"},
+        "effective-date":    {"type": "variable", "datatype": "date", "format": "YYYY-MM-DD", "param": "auto.coverage_start_date"},
+        "vehicle-count":     {"type": "fixed", "datatype": "select", "options": ["Yes", "No"], "param": "auto.multiple_vehicles"},
+        "vehicle-year":      {"type": "variable", "datatype": "text", "param": "auto.vehicle_year"},
+        "vehicle-make":      {"type": "variable", "datatype": "text", "param": "auto.vehicle_make"},
+        "vehicle-model":     {"type": "variable", "datatype": "text", "param": "auto.vehicle_model"},
+        "vehicle-distance":  {"type": "variable", "datatype": "number", "param": "auto.commute_oneway_km"},
+        "vehicle-km":        {"type": "variable", "datatype": "number", "param": "auto.annual_km"},
+        "vehicle-use":       {"type": "fixed", "datatype": "select", "options": ["Commuting", "Pleasure"], "param": "auto.vehicle_use"},
+        "driver-firstname":  {"type": "variable", "datatype": "text", "param": "person.first_name"},
+        "driver-lastname":   {"type": "variable", "datatype": "text", "param": "person.last_name"},
+        "driver-birthdate":  {"type": "variable", "datatype": "date", "format": "YYYY-MM-DD", "param": "person.date_of_birth"},
+        "convictions":       {"type": "fixed", "datatype": "select", "options": ["None", "1", "2", "3", "4", "5"], "param": "auto.convictions"},
+        "accidents":         {"type": "fixed", "datatype": "select", "options": ["None", "1", "2", "3", "4", "5"], "param": "auto.accidents"}
+      }
+    },
+    "canadainsuranceplan_life": {
+      "form_url": "https://canadainsuranceplan.ca/",
+      "kind": "lead_gen",
+      "note": "Homepage 'Start your custom quote' form. Gender/smoker are label toggles (click by text). Submission shows a 'Quote Submitted!' success dialog (broker contacts; no $ on-page).",
+      "fields": {
+        "name":     {"type": "variable", "datatype": "text", "param": "person.first_name"},
+        "email":    {"type": "variable", "datatype": "email", "param": "person.email"},
+        "mobile":   {"type": "variable", "datatype": "tel", "param": "person.phone"},
+        "dob":      {"type": "variable", "datatype": "date", "param": "person.date_of_birth"},
+        "gender":   {"type": "fixed", "datatype": "radio", "options": ["Male", "Female"], "param": "person.sex"},
+        "smoker":   {"type": "fixed", "datatype": "radio", "options": ["Smoker", "Non-smoker"], "param": "life.tobacco_use"},
+        "province": {"type": "fixed", "datatype": "select", "options": ["Alberta", "British Columbia", "Manitoba", "New Brunswick", "Newfoundland and Labrador", "Nova Scotia", "Ontario", "Prince Edward Island", "Quebec", "Saskatchewan", "Northwest Territories", "Nunavut", "Yukon"], "param": "person.province"},
+        "quote_for": {"type": "fixed", "datatype": "select", "options": ["Life Insurance", "Living Benefit", "Super Visa", "Visitor|Travel", "Retirement"], "param": "life.quote_for"}
+      }
+    },
+    "financialmiles_travel": {
+      "form_url": "https://www.financialmiles.com/travel-insurance-quote",
+      "kind": "lead_gen",
+      "note": "Webflow form. Input names use 'TIQ - ' prefix. Quotes delivered to inbox (no $ on-page); submission shows 'Thank you! Your submission has been received!'. Webflow keeps Submit disabled until fields are filled with real events (use Playwright fill/click, not JS value setter).",
+      "fields": {
+        "first_name":      {"type": "variable", "datatype": "text", "param": "person.first_name"},
+        "last_name":       {"type": "variable", "datatype": "text", "param": "person.last_name"},
+        "email":           {"type": "variable", "datatype": "email", "param": "person.email"},
+        "phone":           {"type": "variable", "datatype": "tel", "param": "person.phone"},
+        "dob":             {"type": "variable", "datatype": "date", "format": "YYYY-MM-DD", "param": "person.date_of_birth"},
+        "visa_type":       {"type": "fixed", "datatype": "radio", "options": ["Super Visa", "Visitor Visa"], "param": "travel.visa_type"},
+        "pre_existing":    {"type": "fixed", "datatype": "radio", "options": ["Yes", "No"], "param": "travel.pre_existing"},
+        "coverage_start":  {"type": "variable", "datatype": "date", "format": "YYYY-MM-DD", "param": "travel.coverage_start"},
+        "coverage_end":    {"type": "variable", "datatype": "date", "format": "YYYY-MM-DD", "param": "travel.coverage_end"},
+        "landing_province":{"type": "fixed", "datatype": "select", "options": ["Alberta", "British Columbia", "Manitoba", "New Brunswick", "Newfoundland and Labrador", "Nova Scotia", "Ontario", "Prince Edward Island", "Quebec", "Saskatchewan"], "param": "person.province"}
+      }
+    },
+    "bertramandbarry_car": {
+      "form_url": "https://www.bertramandbarry.ca/quote/car-insurance/",
+      "kind": "lead_gen",
+      "note": "Contact Form 7 #321. Detailed car quote request (29 fields). CF7 mail_sent on submit - representative contacts. No $ on-page.",
+      "fields": {
+        "fullname":         {"type": "variable", "datatype": "text", "param": "person.first_name"},
+        "address":          {"type": "variable", "datatype": "text", "param": "person.street_address"},
+        "city":             {"type": "variable", "datatype": "text", "param": "person.city"},
+        "province":         {"type": "variable", "datatype": "text", "param": "person.province"},
+        "postalcode":       {"type": "variable", "datatype": "postal", "param": "person.postal_code"},
+        "phone":            {"type": "variable", "datatype": "tel", "param": "person.phone"},
+        "emailaddress":     {"type": "variable", "datatype": "email", "param": "person.email"},
+        "age-driver":       {"type": "variable", "datatype": "number", "param": "auto.driver_age"},
+        "marital-status":   {"type": "fixed", "datatype": "select", "options": ["Married", "Single"], "param": "person.marital_status"},
+        "years-licensed":   {"type": "variable", "datatype": "number", "param": "auto.years_licensed"},
+        "addl-gender":      {"type": "fixed", "datatype": "select", "options": ["Male", "Female"], "param": "person.sex"},
+        "certification":    {"type": "fixed", "datatype": "select", "options": ["Yes", "No"], "param": "auto.driver_training"},
+        "convictions":      {"type": "fixed", "datatype": "select", "options": ["Yes", "No"], "param": "auto.convictions"},
+        "business-use":     {"type": "fixed", "datatype": "select", "options": ["Yes", "No"], "param": "auto.business_use"},
+        "commute":          {"type": "fixed", "datatype": "select", "options": ["Yes", "No"], "param": "auto.commutes"},
+        "vehicle":          {"type": "variable", "datatype": "text", "param": "auto.vehicle"},
+        "liability":        {"type": "fixed", "datatype": "select", "options": ["$2,000,000", "$1,000,000"], "param": "auto.liability"},
+        "coverage":         {"type": "fixed", "datatype": "select", "options": ["All perils", "Collision", "Comprehensive", "Specific perils"], "param": "auto.coverage"},
+        "deductible":       {"type": "fixed", "datatype": "select", "options": ["$500", "$250", "$1000"], "param": "auto.deductible"},
+        "addl-vehicles":    {"type": "fixed", "datatype": "select", "options": ["Yes", "No"], "param": "auto.addl_vehicles"},
+        "policy-years":     {"type": "variable", "datatype": "number", "param": "auto.policy_years"},
+        "at-fault-claims":  {"type": "variable", "datatype": "number", "param": "auto.at_fault_claims"},
+        "occupation":       {"type": "variable", "datatype": "text", "param": "person.occupation"},
+        "commute-km":       {"type": "variable", "datatype": "number", "param": "auto.commute_oneway_km"},
+        "canceled":         {"type": "fixed", "datatype": "select", "options": ["Yes", "No"], "param": "auto.canceled_nonpayment"}
+      }
+    },
+    "gpsequipeconseil_life": {
+      "form_url": "https://gpsequipeconseil.com/",
+      "kind": "quote",
+      "note": "WinQuote/Equisoft life comparison widget embedded on the homepage. Obtenir mon prix! -> winquote.net/cgi-bin/compete.pl returns a ranked Report of real annual premiums + quote ID. The submit button is inside an embedded iframe (script needs iframe handling).",
+      "fields": {
+        "First Client Name":             {"type": "variable", "datatype": "text", "param": "person.first_name"},
+        "First Client Phone":            {"type": "variable", "datatype": "tel", "param": "person.phone"},
+        "First Client Email":            {"type": "variable", "datatype": "email", "param": "person.email"},
+        "month":                         {"type": "fixed", "datatype": "select", "options": ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"], "param": "person.date_of_birth"},
+        "day":                           {"type": "fixed", "datatype": "select", "options": ["1","15","31"], "param": "person.date_of_birth"},
+        "year":                          {"type": "fixed", "datatype": "select", "options": ["1980","1990"], "param": "person.date_of_birth"},
+        "First Client Gender":           {"type": "fixed", "datatype": "radio", "options": ["Homme", "Femme"], "param": "person.sex"},
+        "First Client Tobacco Use":      {"type": "fixed", "datatype": "radio", "options": ["Oui", "Non"], "param": "life.tobacco_use"},
+        "First Client Province":         {"type": "fixed", "datatype": "select", "options": ["Québec"], "param": "person.province"},
+        "First Client Premium Amount":   {"type": "fixed", "datatype": "select", "options": ["$ 500,000", "$ 250,000", "$ 1,000,000"], "param": "life.coverage_amount"},
+        "First Client Premium Payment Schedule": {"type": "fixed", "datatype": "select", "options": ["Annuel", "Semi-Annuelles", "Trimestrielles", "Mensuel"], "param": "life.payment_method"},
+        "First Client Product Type":     {"type": "fixed", "datatype": "select", "options": ["Temporaire 20 ans", "Temporaire 10 ans", "Temporaire 30 ans"], "param": "life.term"}
+      }
+    },
+    "activeinsurance_travel": {
+      "form_url": "https://www.activeinsurance.ca/quote-request/travel-insurance/",
+      "kind": "lead_gen",
+      "note": "Contact Form 7 #632. Travel quote request (departure/return/destination + insured). CF7 mail_sent on manual submit - broker contacts. No $ on-page. Automated runs may get CF7 anti-spam (status=spam).",
+      "fields": {
+        "your-name":      {"type": "variable", "datatype": "text", "param": "person.first_name"},
+        "your-address":   {"type": "variable", "datatype": "text", "param": "person.street_address"},
+        "your-city":      {"type": "variable", "datatype": "text", "param": "person.city"},
+        "your-province":  {"type": "variable", "datatype": "text", "param": "person.province"},
+        "your-postalcode": {"type": "variable", "datatype": "postal", "param": "person.postal_code"},
+        "your-phone":     {"type": "variable", "datatype": "tel", "param": "person.phone"},
+        "your-email":     {"type": "variable", "datatype": "email", "param": "person.email"},
+        "departure-date": {"type": "variable", "datatype": "date", "format": "YYYY-MM-DD", "param": "travel.departure_date"},
+        "return-date":    {"type": "variable", "datatype": "date", "format": "YYYY-MM-DD", "param": "travel.return_date"},
+        "destination":    {"type": "variable", "datatype": "text", "param": "travel.destination"},
+        "insured1-name":  {"type": "variable", "datatype": "text", "param": "person.first_name"},
+        "insured1-dob":   {"type": "variable", "datatype": "date", "format": "YYYY-MM-DD", "param": "person.date_of_birth"},
+        "insured1-sex":   {"type": "fixed", "datatype": "select", "options": ["Male", "Female"], "param": "person.sex"},
+        "insured1-health": {"type": "fixed", "datatype": "radio", "options": ["Yes", "No"], "param": "travel.health_concerns"},
+        "insured1-pre":   {"type": "fixed", "datatype": "select", "options": ["None", "Heart", "Respiratory", "Muscle", "Joint", "Digestive", "2 or more", "Other"], "param": "travel.pre_existing"}
+      }
+    }
+  }
+}

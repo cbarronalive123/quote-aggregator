@@ -52,6 +52,23 @@ class Section {
       );
 }
 
+/// A pre-filled intake profile ("saved profile" shortcut). `values` is keyed by
+/// the same field keys as the form schema.
+class Profile {
+  final String id;
+  final String name;
+  final Map<String, String> values;
+
+  Profile({required this.id, required this.name, required this.values});
+
+  factory Profile.fromJson(Map<String, dynamic> json) => Profile(
+        id: (json['id'] ?? '') as String,
+        name: (json['name'] ?? '') as String,
+        values: ((json['values'] ?? const {}) as Map)
+            .map((k, v) => MapEntry(k as String, (v ?? '').toString())),
+      );
+}
+
 class QuoteOutcome {
   final String registryId;
   final String brand;

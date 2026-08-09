@@ -50,6 +50,15 @@ class ApiClient {
         .toList();
   }
 
+  /// Fetch saved/mock pre-filled profiles for the quick-submit shortcut.
+  Future<List<Profile>> fetchProfiles() async {
+    final body = await _send(() => _client.get(_uri('/api/profile')));
+    final list = ((body as Map)['profiles'] ?? const []) as List;
+    return list
+        .map((p) => Profile.fromJson(p as Map<String, dynamic>))
+        .toList();
+  }
+
   /// Submit the filled form and start the quote aggregation. Returns a job id.
   /// When [simulate] is true the in-app call session is created (no phone calls).
   Future<String> startQuote(Map<String, String> values, {bool simulate = false}) async {

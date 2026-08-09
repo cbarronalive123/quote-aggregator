@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'form_page.dart';
 import 'assistant_page.dart';
+import 'api_client.dart';
+import 'models.dart';
 import 'config.dart';
 
 void main() {
@@ -29,6 +31,51 @@ class QuoteDriveApp extends StatelessWidget {
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
+
+  Future<void> _useSavedProfile(BuildContext context) async {
+    final api = ApiClient();
+    List<Profile> profiles;
+    try {
+      profiles = await api.fetchProfiles();
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.toString())));
+      return;
+    }
+    if (!context.mounted) return;
+    final chosen = await showModalBottomSheet<Profile>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const ListTile(
+              leading: Icon(Icons.person_search),
+              title: Text('Choose a saved profile',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            for (final p in profiles)
+              ListTile(
+                leading: const Icon(Icons.person),
+                title: Text(p.name),
+                subtitle: p.id == 'mock'
+                    ? const Text('Mock details for testing')
+                    : const Text('Your saved details'),
+                onTap: () => Navigator.pop(ctx, p),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (chosen != null && context.mounted) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => FormPage(initialValues: chosen.values),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +118,15 @@ class HomePage extends StatelessWidget {
                   ),
                   icon: const Icon(Icons.edit),
                   label: const Text('Fill the form manually'),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => _useSavedProfile(context),
+                  icon: const Icon(Icons.person),
+                  label: const Text('Fill from saved profile'),
                 ),
               ),
               const SizedBox(height: 24),
