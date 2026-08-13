@@ -1,0 +1,9 @@
+rvc-env/
+models/
+__pycache__/
+*.pyc
+.venv/
+auto_quote_agent/profile.json
+auto_quote_agent/call_notes.json
+auto_quote_agent/test_run_notes.json
+auto_quote_agent/recordings/

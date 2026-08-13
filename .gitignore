@@ -12,6 +12,8 @@ personal_profile.py
 personal_profile.db
 quote_params.json
 people/real/
+people/corey_allstate.json
+profile/
 evidence/
 *.png
 *.PDF
@@ -20,6 +22,42 @@ evidence/
 *_result.json
 *.jsonl
 Corey*
+notes/
+videos/
+
+# ---- Browser automation profiles (session cookies) ----
+.allstate_profile/
+.aviva_profile/
+quote_runner/.allstate_profile/
+quote_runner/.aviva_profile/
+
+# ---- Other carrier scripts (only belair/aviva/allstate + quote_runner are published) ----
+/activeinsurance_*.py
+/aldormaninsurance_*.py
+/allianceincome_*.py
+/alllineinsurance_*.py
+/aprilmarine_*.py
+/armour_*.py
+/aviva_home_quote.py
+/bertramandbarry_*.py
+/canadainsuranceplan_*.py
+/canadianterminsurance_*.py
+/cheaplifeinsurance_*.py
+/churchillinsurance_*.py
+/desjardins_*.py
+/diamondinsurancegroup_*.py
+/empire_*.py
+/eriemutual_*.py
+/financialmiles_*.py
+/gpsequipeconseil_*.py
+/vergeinsurance_*.py
+/_extract_ehail.py
+/_query.py
+/_reseed.py
+/_run.py
+/_scan_routes.py
+/DESJARDINS_FORM_MAP.md
+/form_scan_report.json
 
 # ---- Databases ----
 *.db
@@ -29,6 +67,8 @@ data/*.db
 __pycache__/
 *.pyc
 .playwright-mcp/
+.venv/
+venv/
 
 # ---- Node / Next.js ----
 website/node_modules/
@@ -46,8 +86,23 @@ phone-agent/node_modules/
 phone-agent/.env
 phone-agent/recordings/
 phone-agent/calls.json
+phone-agent/contacts.csv
 phone-agent/*.wav
 phone-agent/*.mp3
+phone-agent/.venv/
+
+# ---- Voice AI (exclude venv, models, and runtime PII) ----
+voice_ai/rvc-env/
+voice_ai/models/
+voice_ai/auto_quote_agent/profile.json
+voice_ai/auto_quote_agent/call_notes.json
+voice_ai/auto_quote_agent/test_run_notes.json
+voice_ai/auto_quote_agent/recordings/
+voice_ai/auto_quote_agent/phone_agent_ai.md
+voice_ai/auto_quote_agent/quote_result_json.md
+
+# ---- Quote runner runtime output ----
+quote_runner/latest_results.json
 
 # ---- Misc ----
 *.log

@@ -1,0 +1,33 @@
+# Dependencies for the ISOLATED voice server environment (rvc-env, Python 3.10.4).
+# This env runs BOTH the RVC celebrity-voice engine (Terminator / Robin) AND
+# voice cloning (Qwen3-TTS, Apache 2.0 - fully free incl. commercial) as a
+# single local server (rvc_server.py).
+#
+# These need Python 3.10 + old numpy/fairseq, which conflict with the main app's
+# stack (Python 3.12 + numpy 2 + torch 2.13 CUDA), so they stay isolated.
+#
+# Install order (Python 3.10):
+#   1. pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu126
+#   2. pip install rvc-python --no-deps
+#   3. pip install numpy==1.23.5 scipy<1.11 faiss-cpu==1.7.3 omegaconf==2.3.1 av \
+#        librosa pyworld torchcrepe praat-parselmouth ffmpeg-python loguru \
+#        requests soundfile fastapi uvicorn python-multipart hydra-core \
+#        bitarray regex sacrebleu torchmetrics "setuptools<81"
+#   4. pip install qwen-tts
+#   5. pip install fairseq==0.12.2 --no-deps
+#
+# Fairseq full-import also needs: bitarray regex sacrebleu torchmetrics hydra-core
+#
+# Gotchas:
+#  - torch>=2.6 defaults torch.load to weights_only=True, breaking fairseq.
+#    rvc_server.py patches torch.load to weights_only=False (safe here - these
+#    are the user's own downloaded models).
+#  - "setuptools<81" keeps pkg_resources available (librosa 0.10 / fairseq need it).
+rvc-python
+fastapi
+uvicorn
+python-multipart
+soundfile
+requests
+qwen-tts
+numpy==1.23.5

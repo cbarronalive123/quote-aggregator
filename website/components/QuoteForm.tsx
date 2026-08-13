@@ -2,23 +2,15 @@
 
 import { useMemo, useState } from "react";
 import { formSections, type FieldDef } from "@/lib/formSchema";
-import { defaultProfile, fakeProfile } from "@/lib/data";
 
+// Start the form blank so it can be used for manual entry. It is only auto-filled
+// when the user clicks "My profile" or "Fake profile" (those buttons fetch the
+// server profile and populate the fields via loadProfile).
 function initValues() {
   const v: Record<string, string> = {};
   formSections.forEach((s) =>
     s.fields.forEach((f) => {
-      v[f.key] = (defaultProfile as Record<string, string>)[f.key] ?? "";
-    })
-  );
-  return v;
-}
-
-function valuesFor(profile: Record<string, string>) {
-  const v: Record<string, string> = {};
-  formSections.forEach((s) =>
-    s.fields.forEach((f) => {
-      v[f.key] = profile[f.key] ?? "";
+      v[f.key] = "";
     })
   );
   return v;
@@ -50,8 +42,39 @@ function FieldInput({ field, value, onChange }: { field: FieldDef; value: string
 export default function QuoteForm() {
   const [values, setValues] = useState<Record<string, string>>(initValues);
   const [section, setSection] = useState(0);
+  const [loadingProfile, setLoadingProfile] = useState<"my" | "fake" | null>(null);
 
   const set = (key: string) => (v: string) => setValues((prev) => ({ ...prev, [key]: v }));
+
+  // Load a profile from the server: "my" = saved applicant, "fake" = freshly
+  // generated unique test data. Falls back to the local defaults if the fetch fails.
+  // The loading label ("Loading…" / "Generating…") stays visible for ~3s so the
+  // button clearly shows it did something, then reverts to its normal label.
+  const loadProfile = async (kind: "my" | "fake") => {
+    const started = Date.now();
+    setLoadingProfile(kind);
+    try {
+      const res = await fetch(kind === "my" ? "/api/profile/my" : "/api/profile/fake", {
+        method: kind === "fake" ? "POST" : "GET",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.values) {
+          // Tag which profile kind was used so the history page can file this run
+          // under "My profiles" (real) or "Fake profiles".
+          setValues({ ...data.values, _profile_kind: kind });
+          setSection(0);
+        }
+      }
+    } catch {
+      // fall through to local defaults below
+    }
+    // Keep the button in its "working" state for at least 3s total, then reset it.
+    const elapsed = Date.now() - started;
+    const remaining = Math.max(0, 3000 - elapsed);
+    await new Promise((r) => setTimeout(r, remaining));
+    setLoadingProfile(null);
+  };
 
   const current = formSections[section];
   const isLast = section === formSections.length - 1;
@@ -107,18 +130,20 @@ export default function QuoteForm() {
         <button
           type="button"
           className="btn"
-          onClick={() => setValues(valuesFor(defaultProfile))}
+          onClick={() => loadProfile("my")}
+          disabled={loadingProfile !== null}
           style={{ border: "1px solid rgba(255,255,255,0.15)" }}
         >
-          My profile
+          {loadingProfile === "my" ? "Loading…" : "My profile"}
         </button>
         <button
           type="button"
           className="btn"
-          onClick={() => setValues(valuesFor(fakeProfile))}
+          onClick={() => loadProfile("fake")}
+          disabled={loadingProfile !== null}
           style={{ border: "1px solid rgba(255,255,255,0.15)" }}
         >
-          Fake profile
+          {loadingProfile === "fake" ? "Generating…" : "Fake profile"}
         </button>
       </div>
 

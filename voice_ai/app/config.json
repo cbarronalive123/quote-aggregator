@@ -1,0 +1,13 @@
+{
+  "enabled_voices": [
+    "af_heart",
+    "clone_test"
+  ],
+  "default_voice": "af_heart",
+  "llm_model": "qwen3:4b",
+  "stt_model": "small",
+  "auto_send_speech": true,
+  "rvc_models": {},
+  "rvc_server_url": "http://127.0.0.1:8123",
+  "cloned_voices": {}
+}

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'api_client.dart';
-import 'incoming_call_page.dart';
+import 'results_page.dart';
 
 /// AI-assisted intake: the app asks the user the intake questions one at a time
 /// (speaking each question aloud) and fills the same form the website uses.
@@ -114,10 +114,12 @@ class _AssistantPageState extends State<AssistantPage> {
 
   Future<void> _submitFilled() async {
     try {
-      final jobId = await _api.startQuote(_filled, simulate: true);
+      // Run the real quote aggregation (same as the manual form / website), then
+      // show live progress + results.
+      final jobId = await _api.startQuote(_filled);
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => IncomingCallPage(jobId: jobId)),
+        MaterialPageRoute(builder: (_) => ResultsPage(jobId: jobId)),
       );
     } catch (e) {
       if (!mounted) return;

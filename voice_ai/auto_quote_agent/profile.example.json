@@ -1,0 +1,42 @@
+{
+  "_comment": "Example profile for the voice quote agent. Copy to profile.json locally — do NOT commit real PII.",
+  "profile_name": "Test Driver (example)",
+  "person": {
+    "first_name": "Test",
+    "last_name": "Driver",
+    "email": "test@example.com",
+    "phone": "4165550101",
+    "phone_type": "Cell",
+    "date_of_birth": "1985/05/10",
+    "sex": "M",
+    "marital_status": "Single",
+    "street_address": "123 Example St",
+    "city": "Toronto",
+    "province": "Ontario",
+    "province_code": "ON",
+    "postal_code": "M5V 2T6",
+    "tenure": "renting"
+  },
+  "auto": {
+    "vin": "1HGCM82633A004352",
+    "vehicle_year": "2019",
+    "vehicle_make": "HONDA",
+    "vehicle_model": "ACCORD EX 4DR",
+    "trim": "EX",
+    "drive_type": "FWD",
+    "owned_leased": "Owned",
+    "purchase_year": "2019",
+    "winter_tires": "Yes",
+    "anti_theft": "No",
+    "annual_km": "12000",
+    "commute_days": "5",
+    "commute_oneway_km": "10",
+    "business_use": "No"
+  },
+  "current_insurance": {
+    "insurer": "Example Broker",
+    "policy_number": "TEST-POLICY-001",
+    "broker": "Sample Brokerage Inc.",
+    "status": "active"
+  }
+}

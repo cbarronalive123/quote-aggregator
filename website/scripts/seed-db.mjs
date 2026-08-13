@@ -97,12 +97,25 @@ db.prepare(`INSERT INTO current_insurance VALUES (?,?,?,?)`)
 try {
   const inner = new DatabaseSync(path.join(REPO, "market_registry.db"), { readOnly: true });
   const rows = inner.prepare(`SELECT * FROM rate_sources`).all();
-  const ins = db.prepare(`INSERT OR REPLACE INTO rate_sources VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`);
+  const ins = db.prepare(
+    `INSERT OR REPLACE INTO rate_sources
+       (registry_id,insurer_group,legal_underwriter,brand_or_program,distribution_type,product_scope,
+        distinct_rate_source_id,quote_url,public_phone_route,licensed_intermediary,
+        requirements,automation_notes,status,last_verified_at)
+     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
+  );
   for (const r of rows) {
+    // Build the requirements array from the registry's requires_* flags (Appendix B).
+    const req = [];
+    if (r.requires_licence) req.push("licence");
+    if (r.requires_VIN) req.push("vin");
+    if (r.requires_membership) req.push("membership");
+    if (r.requires_human) req.push("human");
     ins.run(
       r.registry_id ?? null, r.insurer_group ?? null, r.legal_entities ?? null, r.brand ?? null,
       r.distribution_type ?? null, r.product_scope ?? null, r.distinct_rate_source_id ?? null, r.quote_url ?? null,
-      r.public_phone_route ?? null, r.licensed_intermediary ?? null, r.terms_or_automation_notes ?? null,
+      r.public_phone_route ?? null, r.licensed_intermediary ?? null, JSON.stringify(req),
+      r.terms_or_automation_notes ?? null,
       r.status === "seed" ? "unresolved" : (r.status ?? null), r.last_verified_at ?? null
     );
   }

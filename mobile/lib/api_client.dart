@@ -59,6 +59,20 @@ class ApiClient {
         .toList();
   }
 
+  /// Fetch the real saved applicant profile ("My profile" button) — same endpoint
+  /// the website's "My profile" button uses.
+  Future<Profile> fetchMyProfile() async {
+    final body = await _send(() => _client.get(_uri('/api/profile/my')));
+    return Profile.fromJson(body as Map<String, dynamic>);
+  }
+
+  /// Generate a fresh fake profile ("Fake profile" button) — same endpoint the
+  /// website's "Fake profile" button uses.
+  Future<Profile> fetchFakeProfile() async {
+    final body = await _send(() => _client.post(_uri('/api/profile/fake')));
+    return Profile.fromJson(body as Map<String, dynamic>);
+  }
+
   /// Submit the filled form and start the quote aggregation. Returns a job id.
   /// When [simulate] is true the in-app call session is created (no phone calls).
   Future<String> startQuote(Map<String, String> values, {bool simulate = false}) async {
@@ -113,6 +127,15 @@ class ApiClient {
     } catch (_) {
       // stream ended / network error
     }
+  }
+
+  /// Fetch the quote run history (all processed runs, fake vs real).
+  Future<List<QuoteRun>> fetchHistory() async {
+    final body = await _send(() => _client.get(_uri('/api/history')));
+    final runs = ((body as Map)['runs'] ?? const []) as List;
+    return runs
+        .map((r) => QuoteRun.fromJson(r as Map<String, dynamic>))
+        .toList();
   }
 
   /// Poll the aggregation progress/results.

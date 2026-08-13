@@ -34,12 +34,11 @@ flutter pub get
 flutter run
 ```
 
-The app is pointed at the **deployed** website backend (`http://45.137.194.227:31207`)
-by default. Override with `--dart-define=API_BASE_URL` if needed:
+The app defaults to `http://localhost:3000`. Override with `--dart-define=API_BASE_URL` if needed:
 
 | Target             | API_BASE_URL              |
 |--------------------|---------------------------|
-| Deployed server    | `http://45.137.194.227:31207` |
+| Local dev          | `http://localhost:3000`   |
 | Android emulator   | `http://10.0.2.2:3000`    |
 | iOS simulator      | `http://localhost:3000`   |
 | Physical device    | `http://<your-lan-ip>:3000` |
@@ -58,7 +57,7 @@ by default. Override with `--dart-define=API_BASE_URL` if needed:
 | GET    | `/api/call/sse?job_id=` | Server pushes the in-app call (SSE events) |
 | POST   | `/api/call`        | Control the call: `{action: answer\|reply\|end, job_id, text}` |
 
-All endpoints are live on the deployed server (`http://45.137.194.227:31207`).
+All endpoints are served by the website backend (see table above).
 
 Optional: set `OPENAI_API_KEY` on the website for LLM-driven question parsing;
 without it the assistant uses a built-in keyword extractor so it still works.

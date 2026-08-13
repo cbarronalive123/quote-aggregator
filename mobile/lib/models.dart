@@ -117,6 +117,10 @@ class QuoteJob {
   final int progress;
   final int total;
   final List<QuoteOutcome> outcomes;
+  // Live per-step progress reported by the running script (matches the website).
+  final int? progressPercent;
+  final String? progressLabel;
+  final int? progressAttempt;
 
   QuoteJob({
     required this.jobId,
@@ -124,15 +128,60 @@ class QuoteJob {
     required this.progress,
     required this.total,
     this.outcomes = const [],
+    this.progressPercent,
+    this.progressLabel,
+    this.progressAttempt,
   });
 
   double get fraction => total == 0 ? 0 : (progress / total).clamp(0.0, 1.0);
+  double get percentFraction =>
+      progressPercent == null ? 0 : (progressPercent! / 100).clamp(0.0, 1.0);
 
   factory QuoteJob.fromJson(Map<String, dynamic> json) => QuoteJob(
         jobId: (json['job_id'] ?? '') as String,
         status: (json['status'] ?? 'running') as String,
         progress: (json['progress'] ?? 0) as int,
         total: (json['total'] ?? 0) as int,
+        outcomes: ((json['outcomes'] ?? const []) as List)
+            .map((o) => QuoteOutcome.fromJson(o as Map<String, dynamic>))
+            .toList(),
+        progressPercent: (json['progress_percent'] as num?)?.toInt(),
+        progressLabel: json['progress_label'] as String?,
+        progressAttempt: (json['progress_attempt'] as num?)?.toInt(),
+      );
+}
+
+/// One archived quote run (mirrors the website's `/api/history` -> getQuoteHistory).
+class QuoteRun {
+  final int id;
+  final String runAt;
+  final String? label;
+  final String? profile;
+  final String? kind; // fake | real
+  final String? status;
+  final List<QuoteOutcome> outcomes;
+
+  QuoteRun({
+    required this.id,
+    required this.runAt,
+    this.label,
+    this.profile,
+    this.kind,
+    this.status,
+    this.outcomes = const [],
+  });
+
+  bool get isFake => kind == 'fake';
+  int get quotedCount =>
+      outcomes.where((o) => o.isQuoted).length;
+
+  factory QuoteRun.fromJson(Map<String, dynamic> json) => QuoteRun(
+        id: (json['id'] as num?)?.toInt() ?? 0,
+        runAt: (json['run_at'] ?? '') as String,
+        label: json['label'] as String?,
+        profile: json['profile'] as String?,
+        kind: json['kind'] as String?,
+        status: json['status'] as String?,
         outcomes: ((json['outcomes'] ?? const []) as List)
             .map((o) => QuoteOutcome.fromJson(o as Map<String, dynamic>))
             .toList(),

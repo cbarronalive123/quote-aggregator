@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'form_page.dart';
 import 'assistant_page.dart';
+import 'splash_screen.dart';
+import 'history_page.dart';
 import 'api_client.dart';
 import 'models.dart';
 import 'config.dart';
@@ -24,7 +26,7 @@ class QuoteDriveApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const HomePage(),
+      home: const SplashScreen(),
     );
   }
 }
@@ -127,6 +129,17 @@ class HomePage extends StatelessWidget {
                   onPressed: () => _useSavedProfile(context),
                   icon: const Icon(Icons.person),
                   label: const Text('Fill from saved profile'),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const HistoryPage()),
+                  ),
+                  icon: const Icon(Icons.history),
+                  label: const Text('Quote history'),
                 ),
               ),
               const SizedBox(height: 24),

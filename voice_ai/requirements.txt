@@ -1,0 +1,28 @@
+# Voice AI Chatbot - main app dependencies (Python 3.12, venv: .venv)
+#
+# IMPORTANT (Windows + NVIDIA GPU): install CUDA PyTorch FIRST, before the
+# rest, or pip will pull the CPU-only build:
+#   pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu126
+# Then install the rest of this file.
+
+PyQt6>=6.6
+faster-whisper>=1.0
+kokoro>=0.9.4
+soundfile>=0.12
+sounddevice>=0.4
+numpy>=1.26
+ollama>=0.2
+requests>=2.31
+torch  # install the CUDA build as shown above
+
+# ---------------- Recommended models ----------------
+# LLM (via Ollama, set in Settings -> Models):
+#   qwen3:4b     (default - best balance of quality/speed for a 3060)
+#   qwen3:1.7b   (faster, lower latency, slightly lower quality)
+#   llm_model is configured in app/config.json (default: qwen3:4b)
+#
+# STT (speech->text, runs on CUDA): faster-whisper "small" (default)
+# TTS (text->speech): Kokoro-82M (Apache 2.0, bundled)
+#
+# RVC celebrity voices + voice cloning (Qwen3-TTS, Apache 2.0) run in the
+# ISOLATED Python 3.10 env (rvc-env) - see requirements_rvc.txt.

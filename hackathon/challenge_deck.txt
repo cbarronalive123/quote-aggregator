@@ -1,0 +1,234 @@
+WE LCO M E   ·   PL EA SE  CHE CK  I N A T  TH E F R O N T  D ES K
+Welcome, builders.
+Grab a seat, hop on the Wi-Fi, and download today’s challenge brief.
+WI - F I  AC C ES S
+Network
+UofT
+UserID/ Account
+qq582344
+Password
+Aeb6geisie
+Ask any organizer for help.
+D O O R S  O PEN  9 :00  A M   ·   KI C KO FF  9 :3 0 A M   ·   $ 1 ,0 0 0 C AD  P RI Z E  PO O L
+Scan to download the
+challenge brief
+TO DAY  AT  A G L AN C E
+9:00 AM
+Arrival 
+9:30 AM
+Welcome & introductions
+10:00 AM
+Opening Remarks from MyChoice + Q&A
+11:00 AM
+Build time
+12:30 PM
+Lunch break
+3:00 PM
+Same-Day Demo submission deadline
+3:30 PM
+Same-Day Demo 
+4:45 PM
+Wrap-up & final reminder
+
+
+HO ST E D B Y B R AV E A I   ·  I N P AR T N ER S HI P WI TH  M YCH O IC E
+Ontario All-Quote
+Agent Hackathon Challenge
+One intake. Every reachable rate. Evidence for every result.
+Sunday, August 9, 2026 •   9:00 AM – 5:00 PM ET
+$1,000 CAD PRIZE POOL   •   CAREER OPPORTUNITY  •  NETWORKING 
+
+
+A B OU T  YO UR  HO S T  ·   B R AV EC AR E E R .I O
+Brave Career
+An experimental space for AI practitioners.
+Organizing technical events, hackathons, and workshops to 
+help engineers experiment with rapidly evolving tech and 
+build real-world experience through collaboration.
+STUDENTS  ·  ENGINEERS  ·  DATA SCIENTISTS
+B RAVEC A R EER . I O   ·   I N  PA RTN ER S H I P  W I TH  M YC H O I C E
+
+
+A BOU T  Y OU R H OST   ·  BR AV E C AR E ER .IO
+Empowered with 
+AI-native learning and coaching.
+Ontario All-Quote Agent Challenge
+4
+
+
+THE  C HA L L E NG E
+The Mission
+Take your own accurate profile and attempt to obtain a comparable quote from every distinct Ontario auto-insurance rate source you 
+can reach.
+One Intake
+Collect the applicant's data once, then plan 
+the right route for every market.
+Every Reachable Rate
+Direct, agent, broker, aggregator, affinity, 
+specialty, MGA/program, and residual 
+channels.
+Evidence for Every Result
+Every outcome ends in a quote or an 
+evidence-backed terminal status — never a 
+silent gap.
+Personal use only:  build your own assistant, for your own Ontario auto-insurance shopping, using your own information.
+Individual only: No teams, shared repos, or pooled work without written approval.
+Ontario All-Quote Agent Challenge
+3
+
+
+O PE N IN G R E MA R K S  ·   SPO N SO R
+Welcome from MyChoice
+Opening remarks from MyChoice, followed by a walkthrough of today’s challenge brief.
+Aren Mirzaian
+Chief Executive Officer
+MYC HOI CE
+S P O N S O R TAL K   ·   C H A L L EN G E B RI E F W A LK TH R O UG H
+Matthew Roberts
+Chief Operations Officer
+MYC HOI CE
+Scan to download the
+challenge brief
+
+
+Wh a t’ s  N ext
+Event Timeline
+DAY  1 ·  S U NDAY,  A UG US T  9
+Today · 9:00 AM – 5:00 PM
+Today's Agenda
+DAY  2 ·  OF FIC IA L  DE A DL IN E
+Wed Aug 12 · 11:59 PM ET
+Final Submission
+GitHub repo, Loom walkthrough, registry, run report, 
+safety note.
+This is what's judged for the $1,000 prize pool.
+Requires accepting the Submission IP Agreement.
+Ontario All-Quote Agent Challenge
+8
+9:30 AM
+Welcome & introductions
+11:00 AM
+Build time
+12:30 PM
+Lunch break (Lunch provided)
+3:00 PM
+Same-Day Demo submission deadline
+3:30 PM
+Same-Day Demo
+4:45 PM
+Wrap-up & final reminder
+Same-Day Demo Checkpoint
+Showcase and feedback opportunity only.
+Does not replace or determine your final 
+submission.
+Demo participation bonus will be applied 
+during the final submission evaluation.
+DAY  3 ·  Finalists Live Demo - TBD
+
+
+AUG 12 WEDNESDAY, 11:59 PM ET
+Final Submission - What's Due
+GitHub Repository
+Repo URL and enough setup instructions for judges to run your system.
+Loom Walkthrough
+3–5 minutes: routing logic, one real outcome, one evidence-backed blocker.
+Market Registry
+Machine-readable CSV or JSON — sources, statuses, distinct rate-source IDs.
+Redacted Run Report
+Coverage ledger, comparisons, gaps, and timestamps — no sensitive data.
+Architecture & Safety Note
+Agent responsibilities, human checkpoints, data handling, and deletion.
+Submission is conditional on accepting the linked Submission IP Agreement.
+Ontario All-Quote Agent Challenge
+9
+Final submission form:
+https://docs.google.com/forms/
+d/e/1FAIpQLSeffwT9zOQ_GmRH
+Zl3eyCACc38KkdzlV_fi3ufzdttSuS
+T_9w/viewform
+
+
+P R I Z E  P O O L
+$1,000 CAD
+$500
+Best Project
+$200 (× 2) 
+Outstanding Project
+Award 
+$100
+Community
+Spotlight Award
+Judged from your official Wednesday submission  ·  Spotlight Award from your LinkedIn share
+
+
+SH AR E  YO UR  J O U R NE Y
+Tell the World
+What You're Building
+Post your hackathon experience or project 
+progress on LinkedIn.
+Tag @Brave AI  +  @MyChoice
+Awarded to the post with the highest engagement.
+Ontario All-Quote Agent Challenge
+11
+
+
+BUILD YOUR
+CAREER
+Not just a badge for your resume — a real 
+conversation with a company that's hiring 
+now.
+BE Y OND  T H E  P RIZ E
+MyChoice Is Hiring
+The winner of this challenge will be considered for a career opportunity with MyChoice.
+This isn't a token gesture.  Brave AI, through BraveCareer, has hosted similar events before —
+with real hiring outcomes for participants.
+How to be considered: no separate application needed today. Just make sure your final Wednesday 
+submission clearly shows your thinking and technical execution — that's what MyChoice will be looking 
+at.
+Ontario All-Quote Agent Challenge
+7
+
+
+Q&A | Let's Build.
+Questions any time — the event channel stays open all day.
+Hosted by Brave AI   ·   In Partnership with MyChoice
+Final submission  ·  Wednesday, August 12, 2026  ·  11:59 PM ET
+
+
+HO ST E D B Y B R AV E A I   ·  I N P AR T N ER S HI P WI TH  M YCH O IC E •  $1,000 CAD PRIZE POOL
+WI - F I  AC C ES S
+Network
+UofT
+UserID/ Account
+qq582344
+Password
+Aeb6geisie
+Ask any organizer for help.
+TO DAY  AT  A G L AN C E
+9:30 AM
+Welcome & 
+introductions
+11:00 AM
+Build time
+12:30 PM
+Lunch break
+3:00 PM
+Same-Day Demo 
+submission deadline
+3:30 PM
+Same-Day Demo 
+4:45 PM
+Wrap-up & final 
+reminder
+Ontario All-Quote
+Agent Hackathon Challenge
+One intake. Every reachable rate. Evidence for every result.
+​ S am e- day  3 - M I N 
+de mo si g n - up:
+https://docs.google.com/
+forms/d/e/1FAIpQLSdPiC
+yKwicIlTfSvZokh358R9I1
+QDih_SNDkCLmo4nLOMI
+Njg/viewform
+S UB M I S S I O N 
+D EA D L I NE : 3 P M

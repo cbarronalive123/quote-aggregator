@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { createAggregation, getAggregation } from "@/lib/aggregate";
+import type { AggregationJob } from "@/lib/aggregate";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +33,11 @@ export async function GET(req: Request) {
   if (!id) return NextResponse.json({ error: "Missing 'id' param" }, { status: 400 });
   const job = getAggregation(id);
   if (!job) return NextResponse.json({ error: "Job not found" }, { status: 404 });
+  const agg = job as AggregationJob & {
+    progress_percent?: number;
+    progress_label?: string;
+    progress_attempt?: number;
+  };
   return NextResponse.json({
     job_id: job.id,
     status: job.status,
@@ -39,5 +45,8 @@ export async function GET(req: Request) {
     total: job.total,
     outcomes: job.outcomes,
     submitted_values: job.submittedValues,
+    progress_percent: agg.progress_percent ?? null,
+    progress_label: agg.progress_label ?? null,
+    progress_attempt: agg.progress_attempt ?? null,
   });
 }

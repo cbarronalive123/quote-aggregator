@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'api_client.dart';
 import 'models.dart';
-import 'incoming_call_page.dart';
+import 'results_page.dart';
 
 /// The same intake form the website renders, driven by the schema fetched from
 /// `/api/form-schema`. On submit it starts the website's quote aggregation and
@@ -65,15 +65,49 @@ class _FormPageState extends State<FormPage> {
   void _setValue(String key, String v) =>
       setState(() => _values[key] = v);
 
+  Future<void> _applyProfile(Profile p) async {
+    setState(() {
+      for (final s in _sections) {
+        for (final f in s.fields) {
+          _values[f.key] = p.values[f.key] ?? _values[f.key] ?? '';
+        }
+      }
+    });
+  }
+
+  Future<void> _loadMyProfile() async {
+    try {
+      final p = await _api.fetchMyProfile();
+      await _applyProfile(p);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Could not load profile: $e')));
+      }
+    }
+  }
+
+  Future<void> _loadFakeProfile() async {
+    try {
+      final p = await _api.fetchFakeProfile();
+      await _applyProfile(p);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Could not load fake profile: $e')));
+      }
+    }
+  }
+
   Future<void> _submit() async {
     setState(() => _submitting = true);
     try {
-      // Simulated in-app call (free, no phone network): start the quote job with
-      // simulate=true, then open the incoming-call page before the results.
-      final jobId = await _api.startQuote(_values, simulate: true);
+      // Run the real quote aggregation (same as the website), then show live
+      // progress + results.
+      final jobId = await _api.startQuote(_values);
       if (!mounted) return;
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => IncomingCallPage(jobId: jobId)),
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => ResultsPage(jobId: jobId)),
       );
     } catch (e) {
       if (!mounted) return;
@@ -207,6 +241,32 @@ class _FormPageState extends State<FormPage> {
               const Text(
                 'We ask once and reuse it to fill every carrier\'s form — online or by phone.',
                 style: TextStyle(color: Colors.grey, fontSize: 12),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _loadMyProfile,
+                      icon: const Icon(Icons.person, size: 18),
+                      label: const Text('My profile'),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _loadFakeProfile,
+                      icon: const Icon(Icons.person_add_alt_1, size: 18),
+                      label: const Text('Fake profile'),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
               SingleChildScrollView(

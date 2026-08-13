@@ -1,9 +1,9 @@
-import { getQuotes } from "./repo";
+import { getMarket, getQuotes, getSetting, getPhoneAgentUrl, isPhoneCallEnabled, isVncEnabled, recordWebsiteRun } from "./repo";
 import { createCallSession } from "./callSession";
 import { spawn } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import type { QuoteOutcome } from "./types";
+import type { QuoteOutcome, QuoteStatus } from "./types";
 
 /**
  * Aggregation jobs for the Ontario All-Quote prototype.
@@ -28,6 +28,7 @@ export interface AggregationJob {
   createdAt: string;
   submittedValues: Record<string, string>;
   outcomes: QuoteOutcome[];
+  currentScriptId?: string;
 }
 
 const jobs = new Map<string, AggregationJob>();
@@ -50,18 +51,66 @@ function mobilePlaceholder(values: Record<string, string>): QuoteOutcome {
 async function runScriptQuotes(job: AggregationJob, values: Record<string, string>) {
   const scripts = scriptSources();
   for (const script of scripts) {
-    const outcome = await runScript(script, values);
+    const outcome = await runScript(script, values, job);
     if (outcome) {
       job.outcomes.push(outcome);
       job.progress = Math.min(job.total, Math.max(1, job.outcomes.length));
     }
   }
+  // Allstate fallback: Allstate's online quote is gated from the server IP, so when it
+  // comes back blocked/unresolved, place a call to its sales line via the phone agent on
+  // the user's connected cell phone (ADB, Python script on the computer). The phone agent
+  // is reached through an SSH reverse tunnel at phone_agent_url.
+  const allstate = job.outcomes.find((o) => o.registry_id === "allstate");
+  if (allstate && isPhoneCallEnabled() &&
+      (allstate.status === "blocked" || allstate.status === "unresolved")) {
+    const market = getMarket().find((r) => r.distinct_rate_source_id === "allstate");
+    const pretty = market?.public_phone_route || "1-800-255-7828";
+    const number = pretty.replace(/[^0-9+]/g, "");
+    const call = await triggerPhoneCall(number);
+    if (call.ok) {
+      allstate.status = "callback_required";
+      allstate.coverage_notes = `Called Allstate ${pretty} via phone agent (ADB)`;
+      allstate.confidence = "medium";
+      allstate.source = "phone";
+    } else {
+      allstate.coverage_notes = `Phone fallback failed: ${call.detail}`;
+    }
+  }
+}
+
+async function triggerPhoneCall(number: string): Promise<{ ok: boolean; detail?: string }> {
+  const base = getPhoneAgentUrl().replace(/\/+$/, "");
+  try {
+    const res = await fetch(`${base}/call`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ number }),
+      signal: AbortSignal.timeout(20000),
+    });
+    const data = await res.json().catch(() => ({}));
+    return { ok: !!data.ok, detail: data.detail };
+  } catch (e) {
+    return { ok: false, detail: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+// Map the scripts' internal status strings onto the brief's status enum so quoted
+// results (e.g. "quoted_comparable_candidate") are treated as real quotes by the UI
+// and the mobile app.
+function normalizeStatus(parsedStatus: string | undefined, hasQuote: boolean): QuoteStatus {
+  const s = parsedStatus;
+  if (s === "quoted_comparable_candidate") return "quoted_comparable";
+  if (s === "quoted_non_comparable_candidate") return "quoted_non_comparable";
+  if (s && (s as QuoteStatus)) return s as QuoteStatus;
+  return hasQuote ? "quoted_comparable" : "blocked";
 }
 
 // The auto-quote scripts known to return a real-time $ value for auto.
 function scriptSources() {
   return [
     { registry_id: "belairdirect", script: "belairdirect_auto_quote.py", brand: "belairdirect" },
+    { registry_id: "aviva", script: "aviva_auto_quote.py", brand: "Aviva Direct" },
     { registry_id: "allstate", script: "allstate_auto_quote.py", brand: "Allstate" },
   ];
 }
@@ -153,33 +202,62 @@ function buildParams(values: Record<string, string>) {
 
 // Shell out to a *_auto_quote.py script headless with a generated params file and
 // parse its result JSON. Returns null on failure (so the mobile-app outcome still shows).
-async function runScript(src: { script: string; brand: string; registry_id: string }, values: Record<string, string>): Promise<QuoteOutcome | null> {
+async function runScript(src: { script: string; brand: string; registry_id: string }, values: Record<string, string>, job?: AggregationJob): Promise<QuoteOutcome | null> {
   const workDir = "/opt/quotedrive/work"; // shared host volume mounted at /work in the container
   const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  if (job) job.currentScriptId = id;
   const inputHost = path.join(workDir, `${id}.json`);
   const resultHost = path.join(workDir, `${id}_result.json`);
   writeFileSync(inputHost, JSON.stringify(buildParams(values)), "utf8");
   try {
     await new Promise<void>((resolve) => {
+      // True headless is gated by the carriers, so all modes run headed on the
+      // container's :99 display. When the VNC setting is ON the windows are VISIBLE
+      // (watchable in the browser); when OFF they run minimized/off-screen.
+      const vnc = isVncEnabled();
+      const MODE_FLAGS: Record<string, string[]> = vnc
+        ? { belairdirect: ["--headed"], aviva: ["--headed", "--close"], allstate: ["--headed", "--close"] }
+        : { belairdirect: ["--minimized"], aviva: ["--minimized"], allstate: [] };
+      const flags = MODE_FLAGS[src.registry_id] || (vnc ? ["--headed"] : ["--minimized"]);
+      // Run headed/minimized on the container's persistent :99 display (shared via
+      // VNC/noVNC) so the Chrome window is watchable from a browser.
+      // Read automation settings (retries + per-quote timeout) from the shared DB.
+      const retries = parseInt(getSetting("max_retries") ?? "", 10) || 2;
+      const timeoutSeconds = parseInt(getSetting("quote_timeout_seconds") ?? "", 10) || 600;
       const child = spawn("docker", [
-        "exec", "quote-scripts", "python",
+        "exec", "quote-scripts", "env", "DISPLAY=:99", "python",
         `/scripts/${src.script}`,
-        "--headless", "--input", `/work/${id}.json`, "--out", `/work/${id}_result.json`,
+        ...flags, "--progress", `/work/${id}_progress.json`,
+        "--retries", String(retries),
+        "--input", `/work/${id}.json`, "--out", `/work/${id}_result.json`,
       ], { stdio: "ignore" });
-      const timer = setTimeout(() => child.kill(), 180000);
+      // Kill the script if it runs longer than the configured per-quote timeout.
+      const timer = setTimeout(() => child.kill(), timeoutSeconds * 1000);
       child.on("close", () => { clearTimeout(timer); resolve(); });
     });
     if (!existsSync(resultHost)) return null;
-    const parsed = JSON.parse(readFileSync(resultHost, "utf8"));
-    if (!parsed || !parsed.quote_value) return null;
+    let parsed: any;
+    try {
+      parsed = JSON.parse(readFileSync(resultHost, "utf8"));
+    } catch {
+      return null;
+    }
+    if (!parsed) return null;
+    // Report the real status (quoted / blocked / error) so the results page shows
+    // what actually happened instead of leaving the carrier stuck on "pending".
+    const hasQuote = !!parsed.quote_value;
+    const premium = hasQuote ? Number(String(parsed.quote_value).replace(/[^0-9.]/g, "")) : undefined;
     const outcome: QuoteOutcome = {
       registry_id: src.registry_id,
       brand: src.brand,
-      status: "quoted_comparable",
-      monthly_premium: parsed.quote_value ? Number(String(parsed.quote_value).replace(/,/g, "")) : undefined,
+      status: normalizeStatus(parsed.status, hasQuote),
+      monthly_premium: premium,
+      annual_premium: premium != null ? premium * 12 : undefined,
       quote_id: parsed.quote_number ?? undefined,
-      coverage_notes: parsed.coverage ? Object.values(parsed.coverage).join(" | ") : "Automated quote",
-      confidence: "medium",
+      coverage_notes: parsed.coverage
+        ? Object.values(parsed.coverage).join(" | ")
+        : parsed.error ? `Automated quote failed: ${String(parsed.error).slice(0, 120)}` : "Automated quote",
+      confidence: hasQuote ? "medium" : "low",
       timestamp: new Date().toISOString(),
       source: "automated",
       evidence: parsed.evidence ?? undefined,
@@ -197,6 +275,13 @@ async function run(job: AggregationJob, values: Record<string, string>, simulate
   job.progress = Math.min(job.total, Math.max(1, job.outcomes.length));
   createCallSession(job.id, values);
   await runScriptQuotes(job, values);
+  // Persist this website run into the history tables (fake vs real) so it shows on the
+  // /history tabs, not just as an in-memory job.
+  try {
+    recordWebsiteRun(job);
+  } catch (e) {
+    console.error("recordWebsiteRun failed:", e);
+  }
   job.status = "complete";
 }
 
@@ -227,7 +312,23 @@ export function getAggregation(id: string): AggregationJob | undefined {
     getQuotes().filter((q) => phoneIds.includes(q.registry_id)).map((q) => [q.registry_id, q])
   );
   const outcomes = job.outcomes.map((o) => byId.get(o.registry_id) ?? o);
-  return { ...job, outcomes };
+  const agg = { ...job, outcomes };
+  // Attach the current carrier script's live % progress so the results page can show
+  // how far the automation has gotten (per step) instead of only 'carrier n of N'.
+  if (job.status === "running") {
+    try {
+      if (job.currentScriptId) {
+        const progressPath = `/opt/quotedrive/work/${job.currentScriptId}_progress.json`;
+        if (existsSync(progressPath)) {
+          const p = JSON.parse(readFileSync(progressPath, "utf8"));
+          (agg as any).progress_percent = p.percent;
+          (agg as any).progress_label = p.label;
+          (agg as any).progress_attempt = p.attempt;
+        }
+      }
+    } catch { /* no progress file yet */ }
+  }
+  return agg;
 }
 
 export function mergePhoneOutcomeIntoJobs(outcome: QuoteOutcome) {

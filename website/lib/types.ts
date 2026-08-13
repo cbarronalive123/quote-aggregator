@@ -73,6 +73,18 @@ export interface QuoteOutcome {
   recording?: string;
 }
 
+export interface QuoteRun {
+  id: number;
+  run_at: string;
+  label?: string;
+  profile?: string;
+  vehicle?: string;
+  postal?: string;
+  status?: string;
+  kind?: "fake" | "real";
+  outcomes: QuoteOutcome[];
+}
+
 export interface Profile {
   person: Record<string, any>;
   auto: Record<string, any>;

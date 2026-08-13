@@ -4,6 +4,20 @@ import { config } from "@/lib/config";
 
 export const dynamic = "force-dynamic";
 
+// Display times in Eastern Time (America/Toronto). Naive timestamps (no "Z"/offset)
+// were stored as UTC, so treat them as UTC rather than the runtime's guess.
+function fmtTs(iso?: string): string {
+  if (!iso) return "—";
+  const hasOffset = /(?:Z|[+-]\d{2}:\d{2})$/.test(iso.trim());
+  const d = new Date(hasOffset ? iso : `${iso}Z`);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleString(undefined, {
+    timeZone: "America/Toronto",
+    year: "numeric", month: "short", day: "numeric",
+    hour: "2-digit", minute: "2-digit", second: "2-digit",
+  });
+}
+
 export default function CallsPage() {
   const calls = getCalls();
   const market = getMarket();
@@ -82,7 +96,7 @@ export default function CallsPage() {
                     <td><span className="badge text-accent">{c.status}</span></td>
                     <td className="text-muted">{c.recording_path}</td>
                     <td className="text-muted" style={{ maxWidth: 320 }}>{c.outcome_notes}</td>
-                    <td className="text-muted">{c.timestamp}</td>
+                    <td className="text-muted">{fmtTs(c.timestamp)}</td>
                   </tr>
                 ))
               )}

@@ -11,6 +11,6 @@
 class AppConfig {
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://45.137.194.227:31207',
+    defaultValue: 'http://localhost:3000',
   );
 }

@@ -68,6 +68,8 @@ class _ResultsPageState extends State<ResultsPage> {
   }
 
   Widget _buildProgress(QuoteJob job) {
+    final label = job.progressLabel;
+    final attempt = job.progressAttempt;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -80,11 +82,22 @@ class _ResultsPageState extends State<ResultsPage> {
               'Reaching every carrier… ${job.progress}/${job.total}',
               style: const TextStyle(fontSize: 16),
             ),
+            const SizedBox(height: 12),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(999),
+              child: LinearProgressIndicator(
+                value: job.percentFraction,
+                minHeight: 10,
+              ),
+            ),
             const SizedBox(height: 8),
-            const Text(
-              'Direct writers, brokers, aggregators and specialty markets are being contacted.',
+            Text(
+              label != null
+                  ? '${job.progressPercent ?? 0}% · Now: $label'
+                      '${attempt != null && attempt > 1 ? ' (attempt $attempt)' : ''}'
+                  : 'Direct writers, brokers, aggregators and specialty markets are being contacted.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey, fontSize: 12),
+              style: const TextStyle(color: Colors.grey, fontSize: 12),
             ),
           ],
         ),

@@ -15,8 +15,8 @@ function describeVehicle(params: Record<string, string | undefined>) {
   const vehicle =
     params.vehicle_make && params.vehicle_model
       ? `${params.vehicle_year} ${params.vehicle_make} ${params.vehicle_model}${params.trim ? ` ${params.trim}` : ""}`
-      : "2012 RAM 1500 Big Horn Quad Cab 4WD";
-  const postal = params.postal_code || "N2B 2T4";
+      : "2019 HONDA ACCORD EX 4DR";
+  const postal = params.postal_code || "M5V 2T6";
   return { vehicle, postal };
 }
 
@@ -93,7 +93,10 @@ export default async function QuotesPage({ searchParams }: Props) {
     <header className="hero-bg" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
       <nav style={{ maxWidth: 1100, margin: "0 auto", padding: "14px 24px", display: "flex", justifyContent: "space-between" }}>
         <Link href="/" className="text-accent" style={{ fontWeight: 700, fontSize: 17 }}>QuoteDrive</Link>
-        <Link href="/" className="btn">New quote</Link>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <Link href="/history" className="btn">History</Link>
+          <Link href="/quote" className="btn">New quote</Link>
+        </div>
       </nav>
     </header>
   );
@@ -106,7 +109,7 @@ export default async function QuotesPage({ searchParams }: Props) {
       <div className="page-bg" style={{ minHeight: "100vh" }}>
         {header}
         <main style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px" }}>
-          <LiveResults jobId={jobId} cached={base} heading="Your quotes" sub={sub} />
+          <LiveResults jobId={jobId} heading="Your quotes" sub={sub} />
           <p className="text-muted" style={{ marginTop: 20, fontSize: 12 }}>
             Calls to phone-only carriers are placed in sequence after you submit the form; the play
             button opens the recording that produced a phone-sourced premium.

@@ -28,7 +28,7 @@ const sessions = new Map<string, CallSession>();
 // The AI is the REQUESTER calling an insurance agent (the person answering the
 // app). This mirrors the real phone-agent flow.
 const SCRIPT: string[] = [
-  "Hello, this is an automated assistant calling on behalf of Corey Barron to request an Ontario private-passenger auto insurance quote. May I continue with an automated assistant?",
+  "Hello, this is an automated assistant calling on behalf of the applicant to request an Ontario private-passenger auto insurance quote. May I continue with an automated assistant?",
   "Thank you. We're looking for two million dollars in liability, DCPD included, collision and comprehensive with one-thousand-dollar deductibles, OPCF 44R, no telematics. Could you provide the annual premium and the monthly premium for that package?",
   "Great. Do you also have a quote or reference number, the coverage differences, the effective and expiry dates, and any discounts that were applied?",
   "Thank you. Is there anything else before I finalize the quote?",
