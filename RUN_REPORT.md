@@ -1,51 +1,116 @@
-# Run Report — belairdirect (Intact group) — Direct route
+# QuoteDrive — Redacted Run Report
 
-Date: 2026-08-09 (live, headed browser via Playwright MCP)
-Profile: Corey Barron, 2012 RAM 1500 Big Horn Quad Cab 4WD, VIN 1C6RD7GT9CS103678, Kitchener ON
+> **Applicant:** saved personal profile (Ontario resident). PII redacted per hackathon rules — no
+> full name, licence number, address, phone, email, or VIN in this document.
+>
+> **Vehicle (redacted):** 2012 RAM 1500 Quad Cab 4WD · Ontario PPA · Kitchener-area postal code
+>
+> **Benchmark coverage package (apples-to-apples target):**
+> $2M third-party liability · DCPD included · $1,000 collision/comprehensive deductibles ·
+> OPCF 44R family protection · standard accident benefits · no telematics · 12-month term
 
-## Result
-- Status: **quoted_comparable_candidate** (coverage differs from Aviva — see normalization note)
-- Price: **$71.92 / month** (monthly basis, +1.3% interest on monthly payments)
-- Web discount applied; price valid 60 days
-- Quote reference: **# BA13933019**
-- Evidence: `belairdirect_offer_BA13933019.png`
-- Route URL: `https://www.belairdirect.com/` → Car → online rater `webquote.app.belairdirect.com`
-- Phone (for callback route): 1 833 842-4457
+---
 
-## Coverage captured (initial estimated price — not guaranteed)
-| Cover | Detail |
-|---|---|
-| Liability (Property damage & injury) | Covered up to **$1,000,000** |
-| DCPD (Not-at-fault accident) | Covered, deductible **$0** |
-| Family Protection | Covered |
-| Accident Benefits (Med/Rehab/Attendant) | Non-catastrophic **$65,000**; catastrophic **$1,000,000** |
-| Own-damage (Collision/Comprehensive) | Not shown in summary (default offer) |
+## 1. Coverage ledger (benchmark)
 
-## Coverage normalization note (critical for comparison)
-belairdirect defaulted to **$1M liability**; the brief's benchmark is **$2M TPL**. Aviva result
-may be a different limit/deductible. **Do not rank $71.92 vs Aviva until coverage is normalized**
-to the benchmark ($2M TPL, DCPD incl., $1k collision+comp deductible, OPCF 44R, no telematics)
-or both marked `quoted_non_comparable`.
+| Coverage element | Target for comparison |
+|------------------|----------------------|
+| Third-party liability | $2,000,000 |
+| DCPD | Included |
+| Collision / comprehensive | $1,000 deductible each |
+| Endorsements | OPCF 44R (family protection) |
+| Accident benefits | Standard mandatory Ontario AB |
+| Telematics | Declined (benchmark) |
+| Term | 12 months |
 
-## Driver / vehicle inputs used (as submitted)
-- Commute one-way 15 km; annual km 13,001–16,000; condition Used; anti-theft Yes (type: Other)
-- Name Corey Barron; Gender Male; DOB 10/14/1984
-- First licence age **21** (user-corrected; DOB + 21y ≈ 2005)
-- Licence class **G**; Years with current insurer: **5 years or more**
-- Contact: phone 519-476-0578; email cormbar@msn.com; postal N2B 2T4
-- Consent: Terms/Privacy accepted (marketing consent **not** checked)
+---
 
-## Interaction notes (for encoding belairdirect_auto_quote.py)
-- Province/language/cookies overlay → click Confirm (ON/EN) first.
-- Step 1 (info): click "Find your car with VIN", type VIN, then a model combobox appears → pick the resolved trim.
-- Step 2 (usage): commute = numeric spinbutton (set via native value setter + input/change/blur — Angular/shadow DOM);
-  yearly-km combobox; Condition radio; Anti-theft Yes radio → reveals "Select anti-theft system" combobox.
-- Step 3 (driver): name, gender radio, DOB month combobox + day/year textboxes (native setter + Tab needed),
-  first-licence age spinbutton, licence-class radio, years-with-insurer combobox.
-- Step 4 (contact): phone (auto-formats 519-476-0578), email, postal; Group member = none.
-- Consent checkbox "Yes, I agree" (Terms/Privacy) → "Get your price".
-- Offer page shows price + quote ref; "Get a copy of your quote" available.
-- A `feature-exit-intent` overlay periodically intercepts clicks — remove it or retry (not a bot-block).
+## 2. Best full 3-carrier automated run (saved profile)
 
-## Profile correction
-- Phone updated in `personal_profile.py` to 519-476-0578. **Re-run `python personal_profile.py` to reseed `personal_profile.db`** (shell reseed not completed in this session).
+**Run ID:** local `quote_runner` orchestrator · **Timestamp:** 2026-08-11T21:48:53Z (UTC)  
+**Environment:** local headed/minimized Playwright · **Profile:** saved applicant (real)  
+**Source:** `quote_results.jsonl` / parent orchestrator log
+
+| Carrier | Registry ID | Status | Monthly | Annual | Quote ref | Source |
+|---------|---------------|--------|---------|--------|-----------|--------|
+| belairdirect | intact-belair-001 | quoted_comparable | $75.58 | $906.96 | BA13967229 | automated |
+| Aviva Direct | aviva-001 | quoted_comparable | $263.63 | $3,163.56 | Q 022765563 | automated |
+| Allstate | allstate-001 | quoted_comparable | $148.06 | $1,776.72 | 083198576 | automated |
+
+**Comparison (monthly, same profile):** belairdirect **$75.58** · Aviva **$263.63** · Allstate **$148.06**
+
+**Coverage notes:** all three runs used the benchmark intake ($2M TPL, $1k deductibles, OPCF 44R).
+Aviva premium reflects RAM 1500 rating; belairdirect and Allstate completed full online raters.
+
+---
+
+## 3. Latest deployed-server run (saved profile)
+
+**Run ID:** server history #23 · **Timestamp:** 2026-08-12T22:56:55Z  
+**Environment:** deployed QuoteDrive website + Docker Playwright container on VPS  
+**API:** `GET /api/history` on deployed instance
+
+| Carrier | Status | Monthly | Annual | Quote ref | Notes |
+|---------|--------|---------|--------|-----------|-------|
+| belairdirect | quoted_comparable | $68.50 | $822.00 | BA13978515 | automated · evidence screenshot on server |
+| Aviva Direct | **blocked** | — | — | — | `vehicleMake` select timeout (RAM trim mismatch in container session) |
+| Allstate | **blocked** | — | — | — | online quote blocked; phone fallback failed (no physical phone connected) |
+
+**Server pattern (Aug 12, multiple Corey runs):** belairdirect consistently returns **~$68.50/mo**
+(BA13969998–BA13978515). Aviva fails on server due to vehicle-make selector. Allstate online
+blocked from datacenter IP; phone agent dial attempted when device connected.
+
+---
+
+## 4. Evidence-backed handoff / no-quote outcomes
+
+| Carrier | Route | Status | Timestamp | Outcome |
+|---------|-------|--------|-----------|---------|
+| Allstate | Phone (1-800-255-7828 via ADB) | callback_required | 2026-08-12T13:39:18Z | Outbound call placed on connected cell phone; premium not yet parsed back |
+| Allstate | Phone fallback | blocked | 2026-08-12T22:56:55Z | `Phone fallback failed: no physical (cell) phone connected` |
+| Coachman (via NFP) | Licensed broker phone | quoted_non_comparable | 2026-08-09T16:20:10Z | $110.00/mo · ref NFP-4492 · non-standard rating · binder expired |
+
+---
+
+## 5. Coverage normalization gap (belairdirect early run)
+
+**Run date:** 2026-08-09 · **Route:** belairdirect direct online rater  
+**Result:** $71.92/mo · ref **BA13933019** · status `quoted_comparable_candidate`
+
+| Cover (as returned by rater) | Detail |
+|------------------------------|--------|
+| Liability | **$1,000,000** (below $2M benchmark) |
+| DCPD | Included · $0 deductible |
+| Family protection | Included |
+| Accident benefits | Non-cat $65,000 / cat $1,000,000 |
+| Own-damage | Default offer (limits not fully disclosed on summary page) |
+
+**Gap:** rater defaulted to $1M TPL vs $2M benchmark → marked `quoted_comparable_candidate`, not
+ranked against Aviva/Allstate until normalized.
+
+---
+
+## 6. Errors and retries (saved profile timeline)
+
+| Timestamp (UTC) | Carrier | Error (abbreviated) | Resolution |
+|-----------------|---------|---------------------|------------|
+| 2026-08-11T21:13:26 | Aviva | Confirm-button timeout | Fixed in later run |
+| 2026-08-11T21:13:26 | Allstate | Continue button disabled | Fixed in later run |
+| 2026-08-11T21:38:16 | Allstate | Marital-status select mismatch | Fixed in later run |
+| 2026-08-11T21:48:53 | All three | — | **Full success** (Section 2) |
+| 2026-08-12 (server) | Aviva | `vehicleMake` select timeout | Open — RAM/HONDA per-rater vehicle override needed |
+| 2026-08-12 (server) | Allstate | Datacenter IP gate + phone agent unavailable | Phone handoff when ADB device connected |
+
+---
+
+## 7. Summary
+
+- **Real quotes obtained** for all three primary carriers on the saved applicant profile (Section 2).
+- **Deployed server** reproduces belairdirect reliably; Aviva/Allstate show terminal blockers
+  documented above (Section 3–4).
+- **No PII** included in this report. Full run history with timestamps available on the deployed
+  QuoteDrive instance at `/history` (requires server access; DB not committed to GitHub).
+
+---
+
+*Generated for Ontario All-Quote Agent Challenge submission · QuoteDrive · August 2026*
